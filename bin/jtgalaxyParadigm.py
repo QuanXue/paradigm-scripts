@@ -6,6 +6,7 @@ jtgalaxyParadigm.py: handles setup and running of paradigm on multiple cohorts a
 import getopt, os, os.path, re, sys
 from optparse import OptionParser
 from jtParadigm import *
+import shutil
 
 from jobTree.src.bioio import logger
 from jobTree.src.bioio import system
@@ -99,10 +100,12 @@ def wrapParadigm():
     paramFile=os.path.abspath(options.param) if options.param is not None else None
     runEM = options.em
     
+    if os.path.exists(workdir):
+        os.makedirs(workdir)
     dogmaLib = os.path.join(workdir, "dogma")
     pathwayLib = os.path.join(workdir, "pathway")
-    system("unzip %s -d %s" % (dogmaZip, dogmaLib))
-    system("unzip %s -d %s" % (pathwayZip, pathwayLib))
+    system("unzip -o %s -d %s" % (dogmaZip, dogmaLib))
+    system("unzip -o %s -d %s" % (pathwayZip, pathwayLib))
 
     ## run
     logger.info("starting prepare")
@@ -117,6 +120,15 @@ def wrapParadigm():
         if failed:
             print ("%d jobs failed" % failed)
         else:
+            if options.filtered_all is not None:
+                shutil.copy( os.path.join(options.workdir, "merge_merged.all.tab"), options.filtered_all)
+            if options.filtered_real is not None:
+                shutil.copy( os.path.join(options.workdir, "merge_merged.tab"), options.filtered_real)
+            if options.unfiltered_all is not None:
+                shutil.copy( os.path.join(options.workdir, "merge_merged_unfiltered.all.tab"), options.unfiltered_all)
+            if options.unfiltered_real is not None:
+                shutil.copy( os.path.join(options.workdir, "merge_merged_unfiltered.tab"), options.unfiltered_real)
+
             logger.info("Run complete!")
             system("rm -rf .lastjobTree")
             system("mv .jobTree .lastjobTree")
