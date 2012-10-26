@@ -100,7 +100,7 @@ def wrapParadigm():
     paramFile=os.path.abspath(options.param) if options.param is not None else None
     runEM = options.em
     
-    if os.path.exists(workdir):
+    if not os.path.exists(workdir):
         os.makedirs(workdir)
     dogmaLib = os.path.join(workdir, "dogma")
     pathwayLib = os.path.join(workdir, "pathway")
