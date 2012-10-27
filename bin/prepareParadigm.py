@@ -68,6 +68,8 @@ if os.path.exists("/hive/groups/cancerGB/paradigm/exe/newEmSpec/paradigm"):
     publicParadigm = False
 elif os.path.exists("/inside/grotto/users/sng/bin/Paradigm/paradigm"):
     publicParadigm = False
+elif os.path.exists("/data/medbook/"):
+    publicParadigm = False
 else:
     publicParadigm = True
 standardAttach = ["genome", "mRNA", "protein", "active"]
