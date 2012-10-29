@@ -11,7 +11,7 @@ Options:
 ## Written By: Sam Ng
 ## Last Updated: ##/##/####
 import os, os.path, sys, getopt, re
-import mPathway
+import mParadigm
 
 verbose = True
 
@@ -55,12 +55,12 @@ def main(args):
             verbose = False
     
     ## execute
-    (n, i) = mPathway.rPathway(inf)
-    p = mPathway.Pathway(n, i)
+    (n, i) = mParadigm.rPathway(inf)
+    p = mParadigm.Pathway(n, i)
     p.selfTest()
     
     if outf != None:
-        mPathway.wPathway(outf, p.nodes, p.interactions)
+        mParadigm.wPathway(outf, p.nodes, p.interactions)
 
 if __name__ == "__main__":
     main(sys.argv[1:])
