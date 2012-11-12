@@ -20,7 +20,7 @@ basepathway = os.path.join(basedir, "p_global_five3_v2.zip")
 
 paradigmExec = os.path.join(basedir, "paradigm")
 prepareExec = os.path.join(basedir, "prepareParadigm.py")
-inferSpec = "method=BP,updates=SEQFIX,tol=1e-9,maxiter=10000,logdomain=0"
+inferSpec = "method=BP,updates=SEQFIX,tol=1e-9,maxiter=%s,logdomain=0"
 
 class prepareParadigm(Target):
     def __init__(self, evidSpec, disc, paramFile, nullBatches, paradigmExec, inferSpec, dogmaLib, pathwayLib, em, directory):
@@ -69,7 +69,7 @@ def wrapParadigm():
     parser.add_option("-b", "--boundaries", dest="disc", help="Data Discretization Bounds", default="0.33;0.67")
     parser.add_option("-t", "--storedparam", dest="param", help="Initial Parameter Starting Point", default=None)
     parser.add_option("-s", "--skipem", action="store_false", dest="em", help="Skip Running EM", default=True)
-    
+    parser.add_option("--lb-max", dest="lb_max", help="Loopy Belief Max iterations", default=10000)
     parser.add_option("--fr", "--filter-real", dest="filtered_real", help="Filtered Output", default=None)
     parser.add_option("--fa", "--filter-all", dest="filtered_all", help="Filtered Output", default=None)
     parser.add_option("--ur", "--unfilter-real", dest="unfiltered_real", help="Filtered Output", default=None)
@@ -109,7 +109,8 @@ def wrapParadigm():
 
     ## run
     logger.info("starting prepare")
-    s = Stack(prepareParadigm(" ".join(evidList), disc, paramFile, nullBatches, paradigmExec, inferSpec, dogmaLib, pathwayLib, runEM, workdir))
+    argSpec = inferSpec % (options.lb_max)
+    s = Stack(prepareParadigm(" ".join(evidList), disc, paramFile, nullBatches, paradigmExec, argSpec, dogmaLib, pathwayLib, runEM, workdir))
     if options.jobFile:
         s.addToJobFile(options.jobFile)
     else:
