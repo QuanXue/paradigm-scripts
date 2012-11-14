@@ -72,4 +72,7 @@
 		   <filter>unfiltered_all</filter>
 	  </data>
   </outputs>
+  <help>
+Wrapper for Paradigm biological network inference program.  
+  </help>
 </tool>
