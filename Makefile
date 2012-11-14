@@ -57,7 +57,7 @@ exe :
 	ln -s $(THISDIR)/exe/collectParameters bin/
 
 pathmark-scripts :
-	cd ..; git clone git://github.com/sng87/pathmark-scripts.git
+	cd ..; git clone git://github.com/ucscCancer/pathmark-scripts.git
 	ln -s ../pathmark-scripts pathmark-scripts
 	cd pathmark-scripts; make
 

@@ -18,6 +18,7 @@ INSTALL = /cluster/home/ubuntu/paradigm
 WORKBASE = /cluster/home/ubuntu/paradigm_remote_work
 PYTHON = /cluster/home/ubuntu/bin/python2.7
 PYTHONPATH = /cluster/home/ubuntu/paradigm
+USER = baertsch
 
 
 """
@@ -35,14 +36,16 @@ PARADIGM_EXE = "jtgalaxyParadigm.py"
 
 
 def remote_cmd(cmd):
-    ssh_cmd_base = [ 'ssh', '-o', "ServerAliveInterval=60", config.get('REMOTE', 'SERVER') ]
+    ssh_cmd_base = [ 'ssh', '-o', "ServerAliveInterval=60", '-o', "User="+config.get('REMOTE','USER'),  config.get('REMOTE', 'SERVER') ]
+    print "cmd_base", ssh_cmd_base
+    print "cmd", cmd
     p = subprocess.Popen( ssh_cmd_base +  cmd )    
     p.communicate()
     if p.returncode:
         raise Exception("Remote Communication Failure")
 
 def remote_put(local, remote):
-    ssh_cmd_base = ['scp', local, config.get('REMOTE', 'SERVER')+ ":" + remote]
+    ssh_cmd_base = ['scp', '-o', "User="+config.get('REMOTE','USER'), local, config.get('REMOTE', 'SERVER')+ ":" + remote]
     print "put:", " ".join(ssh_cmd_base)
     p = subprocess.Popen( ssh_cmd_base )    
     p.communicate()
@@ -51,7 +54,7 @@ def remote_put(local, remote):
 
 
 def remote_get(local, remote):
-    ssh_cmd_base = ['scp', config.get('REMOTE', 'SERVER') + ":" + remote, local]
+    ssh_cmd_base = ['scp', '-o', "User="+config.get('REMOTE','USER'), config.get('REMOTE', 'SERVER') + ":" + remote, local]
     print "get:", " ".join(ssh_cmd_base)
     p = subprocess.Popen( ssh_cmd_base )    
     p.communicate()

@@ -6,6 +6,7 @@ jtgalaxyParadigm.py: handles setup and running of paradigm on multiple cohorts a
 import getopt, os, os.path, re, sys
 from optparse import OptionParser
 from jtParadigm import *
+import shutil
 
 from jobTree.scriptTree.target import Target
 from jobTree.scriptTree.stack import Stack
@@ -17,7 +18,7 @@ basepathway = os.path.join(basedir, "p_global_five3_v2.zip")
 
 paradigmExec = os.path.join(basedir, "paradigm")
 prepareExec = os.path.join(basedir, "prepareParadigm.py")
-inferSpec = "method=BP,updates=SEQFIX,tol=1e-9,maxiter=10000,logdomain=0"
+inferSpec = "method=BP,updates=SEQFIX,tol=1e-9,maxiter=%s,logdomain=0"
 
 class prepareParadigm(Target):
     def __init__(self, evidSpec, disc, paramFile, nullBatches, paradigmExec, inferSpec, dogmaLib, pathwayLib, em, directory):
@@ -66,7 +67,7 @@ def wrapParadigm():
     parser.add_option("-b", "--boundaries", dest="disc", help="Data Discretization Bounds", default="0.33;0.67")
     parser.add_option("-t", "--storedparam", dest="param", help="Initial Parameter Starting Point", default=None)
     parser.add_option("-s", "--skipem", action="store_false", dest="em", help="Skip Running EM", default=True)
-    
+    parser.add_option("--lb-max", dest="lb_max", help="Loopy Belief Max iterations", default=10000)
     parser.add_option("--fr", "--filter-real", dest="filtered_real", help="Filtered Output", default=None)
     parser.add_option("--fa", "--filter-all", dest="filtered_all", help="Filtered Output", default=None)
     parser.add_option("--ur", "--unfilter-real", dest="unfiltered_real", help="Filtered Output", default=None)
@@ -99,14 +100,17 @@ def wrapParadigm():
     paramFile=os.path.abspath(options.param) if options.param is not None else None
     runEM = options.em
     
+    if not os.path.exists(workdir):
+        os.makedirs(workdir)
     dogmaLib = os.path.join(workdir, "dogma")
     pathwayLib = os.path.join(workdir, "pathway")
-    system("unzip -u %s -d %s" % (dogmaZip, dogmaLib))
-    system("unzip -u %s -d %s" % (pathwayZip, pathwayLib))
+    system("unzip -o %s -d %s" % (dogmaZip, dogmaLib))
+    system("unzip -o %s -d %s" % (pathwayZip, pathwayLib))
 
     ## run
     logger.info("starting prepare")
-    s = Stack(prepareParadigm(" ".join(evidList), disc, paramFile, nullBatches, paradigmExec, inferSpec, dogmaLib, pathwayLib, runEM, workdir))
+    argSpec = inferSpec % (options.lb_max)
+    s = Stack(prepareParadigm(" ".join(evidList), disc, paramFile, nullBatches, paradigmExec, argSpec, dogmaLib, pathwayLib, runEM, workdir))
     if options.jobFile:
         s.addToJobFile(options.jobFile)
     else:
@@ -117,6 +121,15 @@ def wrapParadigm():
         if failed:
             print ("%d jobs failed" % failed)
         else:
+            if options.filtered_all is not None:
+                shutil.copy( os.path.join(options.workdir, "merge_merged.all.tab"), options.filtered_all)
+            if options.filtered_real is not None:
+                shutil.copy( os.path.join(options.workdir, "merge_merged.tab"), options.filtered_real)
+            if options.unfiltered_all is not None:
+                shutil.copy( os.path.join(options.workdir, "merge_merged_unfiltered.all.tab"), options.unfiltered_all)
+            if options.unfiltered_real is not None:
+                shutil.copy( os.path.join(options.workdir, "merge_merged_unfiltered.tab"), options.unfiltered_real)
+
             logger.info("Run complete!")
             if os.path.exists(".lastjobTree"):
                 system("rm -rf .lastjobTree")
