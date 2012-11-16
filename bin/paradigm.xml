@@ -42,9 +42,9 @@
 #end if 
   </command>
   <inputs>
-	  <param name="geneExp" type="data" format="genomicMatrix" label="Gene Exp Matrix" optional="true"/>
-	  <param name="cnv" type="data" format="genomicMatrix" label="Copy Number Matrix" optional="true"/>
-	  <param name="meth" type="data" format="genomicMatrix" label="Methylation Matrix" optional="true"/>
+	  <param name="geneExp" type="data" format="tabular" label="Gene Exp Matrix" optional="true"/>
+	  <param name="cnv" type="data" format="tabular" label="Copy Number Matrix" optional="true"/>
+	  <param name="meth" type="data" format="tabular" label="Methylation Matrix" optional="true"/>
 	  <param name="dogma" type="data" format="zip" label="Dogma Zip File" optional="true"/>
 	  <param name="pathway" type="data" format="zip" label="Pathways Zip File" optional="true"/>
 	  <param name="lower_boundary" type="text" value="0.33" label="Lower Boundary Cutoffs"/>
@@ -59,16 +59,16 @@
 	  <param name="unfiltered_all" type="boolean" label="Output UnFiltered All" checked="false"/>
   </inputs>
   <outputs>
-      <data name="file_filtered_real" format="genomicMatrix" label="Filtered Real">
+      <data name="file_filtered_real" format="tabular" label="Filtered Real">
 		  <filter>filtered_real</filter>
 	  </data>
-      <data name="file_filtered_all" format="genomicMatrix" label="Filtered All">
+      <data name="file_filtered_all" format="tabular" label="Filtered All">
 		   <filter>filtered_all</filter>
 	  </data>
-      <data name="file_unfiltered_real" format="genomicMatrix" label="UnFiltered Real">
+      <data name="file_unfiltered_real" format="tabular" label="UnFiltered Real">
 		   <filter>unfiltered_real</filter>
 	  </data>
-      <data name="file_unfiltered_all" format="genomicMatrix" label="UnFiltered All">
+      <data name="file_unfiltered_all" format="tabular" label="UnFiltered All">
 		   <filter>unfiltered_all</filter>
 	  </data>
   </outputs>
