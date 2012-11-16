@@ -8,8 +8,6 @@ from optparse import OptionParser
 from jtParadigm import *
 import shutil
 
-from jobTree.src.bioio import logger
-from jobTree.src.bioio import system
 from jobTree.scriptTree.target import Target
 from jobTree.scriptTree.stack import Stack
 
@@ -38,9 +36,9 @@ class prepareParadigm(Target):
     def run(self):
         os.chdir(self.directory)
         if self.paramFile is not None:
-            cmd = "%s %s -b \"%s\" -t %s -s same -n %s -i %s -e %s -d %s -p %s %s >& jt.err" % (sys.executable, prepareExec, self.disc, self.paramFile, self.nullBatches, self.inferSpec, self.paradigmExec, self.dogmaLib, self.pathwayLib, self.evidSpec)
+            cmd = "%s %s -b \"%s\" -t %s -s same -n %s -i %s -e %s -d %s -p %s %s " % (sys.executable, prepareExec, self.disc, self.paramFile, self.nullBatches, self.inferSpec, self.paradigmExec, self.dogmaLib, self.pathwayLib, self.evidSpec)
         else:
-            cmd = "%s %s -b \"%s\" -s same -n %s -i %s -e %s -d %s -p %s %s >& jt.err" % (sys.executable, prepareExec, self.disc, self.nullBatches, self.inferSpec, self.paradigmExec, self.dogmaLib, self.pathwayLib, self.evidSpec)
+            cmd = "%s %s -b \"%s\" -s same -n %s -i %s -e %s -d %s -p %s %s " % (sys.executable, prepareExec, self.disc, self.nullBatches, self.inferSpec, self.paradigmExec, self.dogmaLib, self.pathwayLib, self.evidSpec)
         system(cmd)
         self.setFollowOnTarget(jtParadigm(self.em, self.directory))
 
@@ -93,6 +91,8 @@ def wrapParadigm():
     
  
     workdir = os.path.abspath(options.workdir)
+    if not os.path.exists(workdir):
+        os.makedirs(workdir)
     nullBatches = int(options.nulls)
     dogmaZip=os.path.abspath(options.dogmazip)
     pathwayZip=os.path.abspath(options.pathwayzip)
@@ -131,8 +131,10 @@ def wrapParadigm():
                 shutil.copy( os.path.join(options.workdir, "merge_merged_unfiltered.tab"), options.unfiltered_real)
 
             logger.info("Run complete!")
-            system("rm -rf .lastjobTree")
-            system("mv .jobTree .lastjobTree")
+            if os.path.exists(".lastjobTree"):
+                system("rm -rf .lastjobTree")
+            if os.path.exists(".jobTree"):
+                system("mv .jobTree .lastjobTree")
 
 if __name__ == "__main__":
     from jtgalaxyParadigm import *
