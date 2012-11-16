@@ -10,6 +10,7 @@ Options:
   -q            run quietly
 """
 import os, os.path, sys, getopt, re
+import array
 
 delim = "\t"
 verbose = True
@@ -42,7 +43,10 @@ def readFile(inFile, header = True):
         if dataWidth is None:
             dataWidth = len(pline[1:])
         assert(len(pline[1:]) == dataWidth)
-        dataMap[pline[0]] = pline[1:]
+        out = array.array("f")
+        for a in pline[1:]:
+            out.append(float(a))
+        dataMap[pline[0]] = out
     f.close()
     return (dataMap, dataWidth)
 
@@ -100,7 +104,7 @@ def main(args):
                 lineElements += fileData[file][feature]
             else:
                 lineElements += ["" for i in range(fileWidth[file])]
-        print "%s" % (feature + delim + delim.join(lineElements))
+        print "%s" % (feature + delim + delim.join( (str(c) for c in lineElements)) )
 
 if __name__ == "__main__":
     main(sys.argv[1:])
