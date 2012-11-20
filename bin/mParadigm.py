@@ -692,3 +692,12 @@ def floatList(inList):
         except ValueError:
             continue
     return(outList)
+
+def mean(inList, null = "NA"):
+    """Calculates mean"""
+    fList = floatList(inList)
+    if len(fList) == 0:
+        mean = null
+    else:
+        mean = sum(fList)/len(fList)
+    return (mean)
