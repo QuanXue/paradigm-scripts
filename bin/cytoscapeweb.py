@@ -7,6 +7,8 @@ import getopt, os, re, sys
 from mParadigm import *
 from optparse import OptionParser
 
+resourcedir = ".."
+#resourcedir = "/static/scripts"
 basedir = os.path.dirname(os.path.abspath(__file__))
 
 cytoscapewebExec = os.path.join(basedir, "cytoscapewebReport.py")
@@ -61,9 +63,9 @@ def main(args):
         if os.path.exists("LAYOUT/%s_total_netNodes.png" % (feature)):
             tableFiles.append("link:total_netNodes;%s;LAYOUT/%s_total_netNodes.png" % (zscores[0], feature))
         if len(tableFiles) > 0:
-            os.system("%s %s -t \"%s\" -r /static/scripts LAYOUT/%s %s" % (sys.executable, cytoscapewebExec, ",".join(tableFiles), feature, dirPath))
+            os.system("%s %s -t \"%s\" -r %s LAYOUT/%s %s" % (sys.executable, cytoscapewebExec, ",".join(tableFiles), resourcedir, feature, dirPath))
         else:
-            os.system("%s %s -r /static/scripts LAYOUT/%s %s" % (sys.executable, cytoscapewebExec, feature, dirPath))
+            os.system("%s %s -r %s LAYOUT/%s %s" % (sys.executable, cytoscapewebExec, resourcedir, feature, dirPath))
     os.system("mv %s/stats.html %s" % (dirPath, htmlPath))
  
 if __name__ == "__main__":

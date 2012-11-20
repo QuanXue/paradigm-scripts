@@ -18,9 +18,10 @@ Options:
 import getopt, math, os, sys, re
 from matplotlib import *
 use('Agg')
+from types import *
 from pylab import *
 from random import random
-import mData
+from mParadigm import *
 
 verbose = True
 tstep = 0.01
@@ -252,28 +253,43 @@ def main(args):
     samples = []
     features = []
     if sampleFile != None:
-        samples = mData.rList(sampleFile)
+        samples = rList(sampleFile)
     if featureFile != None:
-        features = mData.rList(featureFile)
+        features = rList(featureFile)
     
     ## read circleFiles
     circleData = []
     circleColors = []
     for i in range(len(circleFiles)):
-        (data, cols, rows) = mData.rCRSData(circleFiles[i], retFeatures = True)
+        (data, headers, cols, rows) = rCRSData(circleFiles[i], retFeatures = True)
         circleData.append(data)
-        minCol = rgb(0, 0, 255)
-        zerCol = rgb(255, 255, 255)
-        maxCol = rgb(255, 0, 0)
-        if circleFiles[i].endswith("meth"):
-            maxCol = rgb(0, 0, 255)
-            minCol = rgb(255, 0, 0)
-            log("Color: meth\n")
-        elif circleFiles[i].startswith("mut."):
-            maxCol = rgb(0, 0, 0)
-            minCol = rgb(255, 255, 255)
-            log("Color: mut\n")
-        circleColors.append( (minCol, zerCol, maxCol) )
+        if len(headers) == 0:
+            minCol = rgb(0, 0, 255)
+            zerCol = rgb(255, 255, 255)
+            maxCol = rgb(255, 0, 0)
+            circleColors.append( (minCol, zerCol, maxCol) )
+        else:
+            paramMap = {}
+            for element in headers[0].split(" "):
+                (paramItem, paramColor) = element.split("=")
+                paramRGB = paramColor.split(",")
+                paramMap[paramItem] = rgb(int(paramRGB[0]), int(paramRGB[1]), int(paramRGB[2]))
+            if ("minCol" in paramMap) or ("zerCol" in paramMap) or ("maxCol" in paramMap):
+                if "minCol" in paramMap:
+                    minCol = paramMap["minCol"]
+                else:
+                    minCol = rgb(0, 0, 255)
+                if "zerCol" in paramMap:
+                    zerCol = paramMap["zerCol"]
+                else:
+                    zerCol = rgb(255, 255, 255)
+                if "maxCol" in paramMap:
+                    maxCol = paramMap["maxCol"]
+                else:
+                    maxCol = rgb(255, 0, 0)
+                circleColors.append( (minCol, zerCol, maxCol) )
+            else:
+                circleColors.append(paramMap)
         if sampleFile == None:
             samples = list(set(cols) | set(samples))
         if featureFile == None:
@@ -282,7 +298,7 @@ def main(args):
     ## read centerFile
     centerData = None
     if centerFile != None:
-        centerData = mData.r2Col(centerFile, header = True)
+        centerData = r2Col(centerFile, header = True)
         
     ## sort
     if orderFeature != None:
@@ -290,7 +306,7 @@ def main(args):
             orderData = []
             orderColors = []
             for i in range(len(orderFiles)):
-                orderData.append(mData.rCRSData(orderFiles[i]))
+                orderData.append(rCRSData(orderFiles[i]))
                 minCol = rgb(255, 255, 255)
                 zerCol = rgb(255, 255, 255)
                 maxCol = rgb(0, 0, 0)
@@ -314,14 +330,20 @@ def main(args):
                             ringVals.append(orderData[i][sample][orderFeature])
                         elif "*" in orderData[i][sample]:
                             ringVals.append(orderData[i][sample]["*"])
-                minVal = min([-0.01]+mData.floatList(ringVals))
-                maxVal = max([0.01]+mData.floatList(ringVals))
+                minVal = min([-0.01]+floatList(ringVals))
+                maxVal = max([0.01]+floatList(ringVals))
                 for sample in samples:
                     if sample in orderData[i]:
                         if orderFeature in orderData[i][sample]:
-                            ringCols.append(getColor(orderData[i][sample][orderFeature], minVal, maxVal, minColor = orderColors[i][0], zeroColor = orderColors[i][1], maxColor = orderColors[i][2]))
+                            if type(orderColors[i]) is TupleType:
+                                ringCols.append(getColor(orderData[i][sample][orderFeature], minVal, maxVal, minColor = orderColors[i][0], zeroColor = orderColors[i][1], maxColor = orderColors[i][2]))
+                            else:
+                                ringCols.append(orderColors[i][orderData[i][sample][orderFeature]].tohex())
                         elif "*" in orderData[i][sample]:
-                            ringCols.append(getColor(orderData[i][sample]["*"], minVal, maxVal, minColor = orderColors[i][0], zeroColor = orderColors[i][1], maxColor = orderColors[i][2]))
+                            if type(orderColors[i]) is TupleType:
+                                ringCols.append(getColor(orderData[i][sample]["*"], minVal, maxVal, minColor = orderColors[i][0], zeroColor = orderColors[i][1], maxColor = orderColors[i][2]))
+                            else:
+                                ringCols.append(orderColors[i][orderData[i][sample]["*"]].tohex())
                         else:
                             ringCols.append(rgb(200, 200, 200).tohex())
                     else:
@@ -342,8 +364,8 @@ def main(args):
         centerCol = rgb(255, 255, 255).tohex()
         if centerData != None:
             if feature in centerData:
-                minVal = min([-0.01]+mData.floatList(centerData.values()))
-                maxVal = max([0.01]+mData.floatList(centerData.values()))
+                minVal = min([-0.01]+floatList(centerData.values()))
+                maxVal = max([0.01]+floatList(centerData.values()))
                 centerCol = getColor(centerData[feature], minVal, maxVal)
                 log("\t%s,%s,%s,%s\n" % (centerData[feature],minVal,maxVal,centerCol))
         circleCols = []
@@ -356,14 +378,20 @@ def main(args):
                         ringVals.append(circleData[i][sample][feature])
                     elif "*" in circleData[i][sample]:
                         ringVals.append(circleData[i][sample]["*"])
-            minVal = min([-0.01]+mData.floatList(ringVals))
-            maxVal = max([0.01]+mData.floatList(ringVals))
+            minVal = min([-0.01]+floatList(ringVals))
+            maxVal = max([0.01]+floatList(ringVals))
             for sample in samples:
                 if sample in circleData[i]:
                     if feature in circleData[i][sample]:
-                        ringCols.append(getColor(circleData[i][sample][feature], minVal, maxVal, minColor = circleColors[i][0], zeroColor = circleColors[i][1], maxColor = circleColors[i][2]))
+                        if type(circleColors[i]) is TupleType:
+                            ringCols.append(getColor(circleData[i][sample][feature], minVal, maxVal, minColor = circleColors[i][0], zeroColor = circleColors[i][1], maxColor = circleColors[i][2]))
+                        else:
+                            ringCols.append(circleColors[i][circleData[i][sample][feature]].tohex())
                     elif "*" in circleData[i][sample]:
-                        ringCols.append(getColor(circleData[i][sample]["*"], minVal, maxVal, minColor = circleColors[i][0], zeroColor = circleColors[i][1], maxColor = circleColors[i][2]))
+                        if type(circleColors[i]) is TupleType:
+                            ringCols.append(getColor(circleData[i][sample]["*"], minVal, maxVal, minColor = circleColors[i][0], zeroColor = circleColors[i][1], maxColor = circleColors[i][2]))
+                        else:
+                            ringCols.append(circleColors[i][circleData[i][sample]["*"]].tohex())
                     else:
                         ringCols.append(rgb(200, 200, 200).tohex())
                 else:
