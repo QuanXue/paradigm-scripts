@@ -595,7 +595,7 @@ def rCRSData(inf, appendData = {}, delim = "\t", null = "NA", useCols = None, us
                     continue
             inData[col][row] = [appendData[col][row]]
     ## read header
-    f = openAnyFile(inf)
+    f = open(inf, "r")
     line = f.readline()
     if line.isspace():
         log("ERROR: encountered a blank on line 1\n", die = True)
