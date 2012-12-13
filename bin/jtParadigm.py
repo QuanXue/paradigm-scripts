@@ -128,27 +128,6 @@ class Merge(Target):
         mergeFiles = glob.glob("mergeFiles/*transpose*")
         if len(mergeFiles) == 1: # a global pathway
             system("cat %s | sed 's/ loglikelihood=-[0-9.]*//g' > merge_merged_unfiltered.all.tab" % (mergeFiles[0]))
-            o = open("merge_merged_unfiltered.tab", "w")
-            f = open("merge_merged_unfiltered.all.tab", "r")
-            sampleNames = f.readline().rstrip().split("\t")[1:]
-            includeCols = []
-            for i, sample in enumerate(sampleNames):
-                if sample.startswith("na_") or sample.startswith("nw_"):
-                    continue
-                includeCols.append(i)
-            data = [sampleNames[i] for i in includeCols]
-            o.write("%s\t%s\n" % ("id", "\t".join(data)))
-            for line in f:
-                pline = line.rstrip().split("\t")
-                feature = pline[0]
-                data = [pline[i+1] for i in includeCols]
-                o.write("%s\t%s\n" % (feature, "\t".join(data)))
-            f.close()
-            o.close()
-            system("%s %s -n merge_merged_unfiltered.tab 1,0.5 > merge_merged.tab" % (sys.executable, filterFeatures))
-            system("cut -f1 merge_merged.tab > filter.include")
-            system("%s %s -h filter.include merge_merged_unfiltered.all.tab > merge_merged.all.tab" % (sys.executable, pyJoin))
-            system("rm -f filter.include")
         else:
             system("%s %s bioInt mergeFiles/" % (sys.executable, mergeMerge))
 

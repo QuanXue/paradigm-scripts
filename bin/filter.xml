@@ -1,0 +1,33 @@
+<tool id="filter-paradigm" name="Filter Paradigm" version="1.1.0">
+  <description>Filter Paradigm</description>
+  <command interpreter="python">filterParadigm.py 
+-w ./
+#if $filtered_all:
+  -fa $file_filtered_all
+#end if
+#if $filtered_real:
+  -fr $file_filtered_real
+#end if
+#if $unfiltered_real:
+  -ur $file_unfiltered_real
+#end if
+$paradigm
+  </command>
+  <inputs>
+	  <param name="paradigm" type="data" format="genomicMatrix" label="Unfiltered All" optional="false"/>
+	  <param name="filtered_real" type="boolean" label="Output Filtered Real" checked="true"/>
+	  <param name="filtered_all" type="boolean" label="Output Filtered All" checked="false"/>
+	  <param name="unfiltered_real" type="boolean" label="Output UnFiltered Real" checked="false"/>
+  </inputs>
+  <outputs>
+      <data name="file_filtered_real" format="genomicMatrix">
+		  <filter>filtered_real</filter>
+	  </data>
+      <data name="file_filtered_all" format="genomicMatrix">
+		   <filter>filtered_all</filter>
+	  </data>
+      <data name="file_unfiltered_real" format="genomicMatrix">
+		   <filter>unfiltered_real</filter>
+	  </data>
+  </outputs>
+</tool>

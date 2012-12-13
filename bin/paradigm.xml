@@ -19,17 +19,15 @@
 #end if
 --lb-max $lb_max
 -w ./
-#if $filtered_all:
-  --fa $file_filtered_all
+-o $file_output
+#if $output_params:
+  --op $file_output_params
 #end if
-#if $filtered_real:
-  --fr $file_filtered_real
+#if $output_config:
+  --oc $file_output_config
 #end if
-#if $unfiltered_all:
-  --ua $file_unfiltered_all
-#end if
-#if $unfiltered_real:
-  --ur $file_unfiltered_real
+#if $output_files:
+  --of $file_output_files
 #end if
 #if str($geneExp) != 'None':
   mRNA file:$geneExp
@@ -53,23 +51,23 @@
 	  <param name="skip_em" type="boolean" label="Skip EM Cycle" checked="false"/>
 	  <param name="lb_max" type="integer" label="Loopy Belief Max Iteration" value="10000"/>
 	  <param name="storedparam" type="data" format="txt" label="Precomputer Parameter File" optional="True"/>
-	  <param name="filtered_real" type="boolean" label="Output Filtered Real" checked="true"/>
-	  <param name="filtered_all" type="boolean" label="Output Filtered All" checked="false"/>
-	  <param name="unfiltered_real" type="boolean" label="Output UnFiltered Real" checked="false"/>
-	  <param name="unfiltered_all" type="boolean" label="Output UnFiltered All" checked="false"/>
+	  <param name="output" type="boolean" label="Output Unfiltered All" checked="true"/>
+	  <param name="output_params" type="boolean" label="Output Params" checked="false"/>
+	  <param name="output_config" type="boolean" label="Output Config" checked="false"/>
+	  <param name="output_files" type="boolean" label="Output Files" checked="false"/>      
   </inputs>
   <outputs>
-      <data name="file_filtered_real" format="tabular" label="Filtered Real">
-		  <filter>filtered_real</filter>
+      <data name="file_output" format="tabular" label="Unfiltered All">
+		  <filter>output</filter>
 	  </data>
-      <data name="file_filtered_all" format="tabular" label="Filtered All">
-		   <filter>filtered_all</filter>
+      <data name="file_output_params" format="tabular" label="Params">
+		  <filter>output</filter>
 	  </data>
-      <data name="file_unfiltered_real" format="tabular" label="UnFiltered Real">
-		   <filter>unfiltered_real</filter>
+      <data name="file_output_config" format="tabular" label="Config">
+		  <filter>output</filter>
 	  </data>
-      <data name="file_unfiltered_all" format="tabular" label="UnFiltered All">
-		   <filter>unfiltered_all</filter>
+      <data name="file_output_files" format="zip" label="Files">
+		  <filter>zip</filter>
 	  </data>
   </outputs>
   <help>
