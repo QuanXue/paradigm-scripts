@@ -1,4 +1,4 @@
-<tool id="filter-paradigm" name="Filter Paradigm" version="1.1.0">
+<tool id="filter_paradigm" name="Filter Paradigm" version="1.0.0">
   <description>Filter Paradigm</description>
   <command interpreter="python">filterParadigm.py 
 -w ./
@@ -14,19 +14,19 @@
 $paradigm
   </command>
   <inputs>
-	  <param name="paradigm" type="data" format="genomicMatrix" label="Unfiltered All" optional="false"/>
+	  <param name="paradigm" type="data" label="Paradigm Output" optional="false"/>
 	  <param name="filtered_real" type="boolean" label="Output Filtered Real" checked="true"/>
 	  <param name="filtered_all" type="boolean" label="Output Filtered All" checked="false"/>
 	  <param name="unfiltered_real" type="boolean" label="Output UnFiltered Real" checked="false"/>
   </inputs>
   <outputs>
-      <data name="file_filtered_real" format="genomicMatrix">
+      <data name="file_filtered_real" format="tabular">
 		  <filter>filtered_real</filter>
 	  </data>
-      <data name="file_filtered_all" format="genomicMatrix">
+      <data name="file_filtered_all" format="tabular">
 		   <filter>filtered_all</filter>
 	  </data>
-      <data name="file_unfiltered_real" format="genomicMatrix">
+      <data name="file_unfiltered_real" format="tabular">
 		   <filter>unfiltered_real</filter>
 	  </data>
   </outputs>
