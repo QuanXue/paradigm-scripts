@@ -577,6 +577,76 @@ def shortestPath(source, target, interactions):
         allPaths = deepcopy(nextPaths)
     return (shortestPaths)
 
+def rCRSData(inf, appendData = {}, delim = "\t", null = "NA", useCols = None, useRows = None, retFeatures = False, debug = False):
+    """reads .tsv into a [col][row] dictionary"""
+    inData = {}
+    inComments = []
+    colFeatures = []
+    rowFeatures = []
+    ## copy appendData
+    for col in appendData.keys():
+        if useCols != None:
+            if col not in useCols:
+                continue
+        inData[col] = {}
+        for row in appendData[col].keys():
+            if useRows != None:
+                if row not in useRows:
+                    continue
+            inData[col][row] = [appendData[col][row]]
+    ## read header
+    f = open(inf, "r")
+    line = f.readline()
+    if line.isspace():
+        log("ERROR: encountered a blank on line 1\n", die = True)
+    line = line.rstrip("\r\n")
+    pline = re.split(delim, line)
+    lineLength = len(pline)
+    if debug:
+        log("%s\nLENGTH: %s\n" % (line, lineLength))
+    colIndex = {}
+    for i, col in enumerate(pline[1:]):
+        if useCols != None:
+            if col not in useCols:
+                continue
+        colIndex[col] = i
+        colFeatures.append(col)
+        if col not in inData:
+            inData[col] = {}
+    ## read data
+    for line in f:
+        if line.isspace():
+            continue
+        line = line.rstrip("\r\n")
+        if line.startswith("## "):
+            inComments.append(line.lstrip("##"))
+        pline = re.split(delim, line)
+        row = pline[0]
+        if useRows != None:
+            if row not in useRows:
+                continue
+        rowFeatures.append(row)
+        if debug:
+            log("%s\nLENGTH: %s\n" % (line, len(pline)))
+        if len(pline) != lineLength:
+            log("ERROR: length of line does not match the rest of the file\n", die = True)
+        for col in colFeatures:
+            if row not in inData[col]:
+                inData[col][row] = []
+            if pline[colIndex[col]+1] == "":
+                inData[col][row].append(null)
+            else:            
+                inData[col][row].append(pline[colIndex[col]+1])
+    f.close()
+    ## average entries
+    for col in inData.keys():
+        for row in inData[col].keys():
+            inData[col][row] = mean(inData[col][row], null = inData[col][row][0])
+    if retFeatures:
+        return(inData, inComments, colFeatures, rowFeatures)
+    else:
+        return(inData)
+
 def rList(inf, header = False):
     """read 1 column list"""
     inList = []
@@ -609,3 +679,25 @@ def r2Col(inf, appendData = {}, delim = "\t", null = "NA", header = False):
         inData[pline[0]] = pline[1]
     f.close()
     return(inData)
+
+def floatList(inList):
+    """returns only numeric elements of a list"""
+    outList = []
+    for i in inList:
+        try:
+            fval = float(i)
+            if fval != fval:
+                raise ValueError
+            outList.append(fval)
+        except ValueError:
+            continue
+    return(outList)
+
+def mean(inList, null = "NA"):
+    """Calculates mean"""
+    fList = floatList(inList)
+    if len(fList) == 0:
+        mean = null
+    else:
+        mean = sum(fList)/len(fList)
+    return (mean)

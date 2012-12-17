@@ -72,10 +72,11 @@ def wrapParadigm():
     parser.add_option("-t", "--storedparam", dest="param", help="Initial Parameter Starting Point", default=None)
     parser.add_option("-s", "--skipem", action="store_false", dest="em", help="Skip Running EM", default=True)
     parser.add_option("--lb-max", dest="lb_max", help="Loopy Belief Max iterations", default=10000)
-    parser.add_option("--fr", "--filter-real", dest="filtered_real", help="Filtered Output", default=None)
-    parser.add_option("--fa", "--filter-all", dest="filtered_all", help="Filtered Output", default=None)
-    parser.add_option("--ur", "--unfilter-real", dest="unfiltered_real", help="Filtered Output", default=None)
-    parser.add_option("--ua", "--unfilter-all", dest="unfiltered_all", help="Filtered Output", default=None)
+    
+    parser.add_option("-o", "--output", dest="output_paradigm", help="Unfiltered Output", default=None)
+    parser.add_option("--op", "--output-params", dest="output_params", help="Parameter Output", default=None)
+    parser.add_option("--oc", "--output-config", dest="output_config", help="Config Output", default=None)
+    parser.add_option("--of", "--output-files", dest="output_files", help="Output Files", default=None)
     
     options, args = parser.parse_args()
     logger.info("options: " + str(options))
@@ -125,15 +126,15 @@ def wrapParadigm():
         if failed:
             print ("%d jobs failed" % failed)
         else:
-            if options.filtered_all is not None:
-                shutil.copy( os.path.join(options.workdir, "merge_merged.all.tab"), options.filtered_all)
-            if options.filtered_real is not None:
-                shutil.copy( os.path.join(options.workdir, "merge_merged.tab"), options.filtered_real)
-            if options.unfiltered_all is not None:
-                shutil.copy( os.path.join(options.workdir, "merge_merged_unfiltered.all.tab"), options.unfiltered_all)
-            if options.unfiltered_real is not None:
-                shutil.copy( os.path.join(options.workdir, "merge_merged_unfiltered.tab"), options.unfiltered_real)
-
+            shutil.copy( os.path.join(options.workdir, "merge_merged_unfiltered.all.tab"), options.output_paradigm)
+            if options.output_params is not None:
+                shutil.copy( os.path.join(options.workdir, "params.txt"), options.output_params)
+            if options.output_config is not None:
+                shutil.copy( os.path.join(options.workdir, "config.txt"), options.output_config)
+            if options.output_files is not None:
+                system("zip -r outputFiles.zip outputFiles")
+                shutil.copy( os.path.join(options.workdir, "outputFiles.zip"), options.output_files)
+                
             logger.info("Run complete!")
             if os.path.exists(".lastjobTree"):
                 system("rm -rf .lastjobTree")
