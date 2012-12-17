@@ -7,9 +7,13 @@ import getopt, os, os.path, re, sys
 from optparse import OptionParser
 from jtParadigm import *
 import shutil
+import logging
 
 from jobTree.scriptTree.target import Target
 from jobTree.scriptTree.stack import Stack
+
+logging.basicConfig(filename="paradigm.log", level=logging.INFO)
+
 
 basedir = os.path.dirname(os.path.abspath(__file__))
 
