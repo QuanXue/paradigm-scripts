@@ -7,11 +7,11 @@ import os.path
 import re
 import resource
 import glob
+import logging
 
 from optparse import OptionParser
 
-from jobTree.src.bioio import logger
-from jobTree.src.bioio import system
+from os import system
 
 from jobTree.scriptTree.target import Target
 from jobTree.scriptTree.stack import Stack
@@ -54,7 +54,7 @@ class MaximizationIteration(Target):
         prevLL = self.readLL("params%i.txt" % (self.iteration - 1))
         currLL = self.readLL("params%i.txt" % (self.iteration))
         decrease = ((prevLL - currLL) / currLL)
-        logger.info("LL: %5g, Decrease: %3g" % (currLL, 100*decrease))
+        logging.info("LL: %5g, Decrease: %3g" % (currLL, 100*decrease))
         return decrease < self.tolerance
 
     def run(self):
@@ -161,12 +161,12 @@ def main():
     if len(args) == 1:
         tolerance = float(args[0])
 
-    logger.info("options: " + str(options))
+    logging.info("options: " + str(options))
 
     ##
     ## Run
     ##
-    logger.info("starting first EM iteration")
+    logging.info("starting first EM iteration")
     s = Stack(ExpectationIteration(0, tolerance, os.getcwd()))
     if options.jobFile:
         s.addToJobFile(options.jobFile)
@@ -178,7 +178,7 @@ def main():
         if failed:
             print ("%d jobs failed" % failed)
         else:
-            logger.info("Run complete!")
+            logging.info("Run complete!")
 
 if __name__ == "__main__":
     from jtParadigm import *
