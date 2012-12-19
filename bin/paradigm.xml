@@ -51,23 +51,20 @@
 	  <param name="skip_em" type="boolean" label="Skip EM Cycle" checked="false"/>
 	  <param name="lb_max" type="integer" label="Loopy Belief Max Iteration" value="10000"/>
 	  <param name="storedparam" type="data" format="txt" label="Precomputer Parameter File" optional="True"/>
-	  <param name="output" type="boolean" label="Output Unfiltered All" checked="true"/>
 	  <param name="output_params" type="boolean" label="Output Params" checked="false"/>
 	  <param name="output_config" type="boolean" label="Output Config" checked="false"/>
 	  <param name="output_files" type="boolean" label="Output Files" checked="false"/>      
   </inputs>
   <outputs>
-      <data name="file_output" format="tabular" label="Unfiltered All">
-		  <filter>output</filter>
-	  </data>
+      <data name="file_output" format="tabular" label="Unfiltered All"/>
       <data name="file_output_params" format="tabular" label="Params">
-		  <filter>output</filter>
+		  <filter>output_params</filter>
 	  </data>
       <data name="file_output_config" format="tabular" label="Config">
-		  <filter>output</filter>
+		  <filter>output_config</filter>
 	  </data>
       <data name="file_output_files" format="zip" label="Files">
-		  <filter>zip</filter>
+		  <filter>output_files</filter>
 	  </data>
   </outputs>
   <help>
