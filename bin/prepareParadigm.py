@@ -56,7 +56,8 @@ scriptDirectory = os.path.realpath(os.path.dirname(sys.argv[0]))
 evidenceTypes = {
     "file":  (("cat %%s" +
                " | %s %s/quantileTransform.py /dev/stdin") % (sys.executable, scriptDirectory)),
-    "rawFile":  "cat %s"
+    "rawFile":  "cat %s",
+    "rawTrans": "%s %s/transpose.py -f %%s -" % (sys.executable, scriptDirectory)
     }
 
 dataDir = "clusterFiles"

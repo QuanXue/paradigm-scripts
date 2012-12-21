@@ -95,8 +95,11 @@ def transformFile(fh, sep="\t"):
     printElapsed(startTime)
     
     log("sorting float values...")
-    sortedValues = array.array('f', floatValues) 
-    
+    sortedValues = array.array('f')
+    for f in floatValues:
+        if f == f:
+             sortedValues.append(f)
+             
     csort(sortedValues)
 
     i = 0

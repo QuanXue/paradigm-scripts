@@ -30,19 +30,34 @@
   --of $file_output_files
 #end if
 #if str($geneExp) != 'None':
+#if $geneExp_pre:
+  mRNA rawTrans:$geneExp
+#else
   mRNA file:$geneExp
+#end if
 #end if 
 #if str($cnv) != 'None':
+#if $cnv_pre:
+  genome rawTrans:$cnv
+#else
   genome file:$cnv
+#end if
 #end if 
 #if str($meth) != 'None':
+#if $meth_pre:
+  meth rawTrans:$meth
+#else
   meth file:$meth
+#end if 
 #end if 
   </command>
   <inputs>
 	  <param name="geneExp" type="data" format="tabular" label="Gene Exp Matrix" optional="true"/>
+    <param name="geneExp_pre" type="boolean" label="Pre-Adjusted Gene Expression Values"/>
 	  <param name="cnv" type="data" format="tabular" label="Copy Number Matrix" optional="true"/>
+    <param name="cnv_pre" type="boolean" label="Pre-Adjusted Copy Number Values"/>
 	  <param name="meth" type="data" format="tabular" label="Methylation Matrix" optional="true"/>
+    <param name="meth_pre" type="boolean" label="Pre-Adjusted Methylation Values"/>
 	  <param name="dogma" type="data" format="zip" label="Dogma Zip File" optional="true"/>
 	  <param name="pathway" type="data" format="zip" label="Pathways Zip File" optional="true"/>
 	  <param name="lower_boundary" type="text" value="0.33" label="Lower Boundary Cutoffs"/>
