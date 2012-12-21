@@ -28,7 +28,7 @@ if __name__ == "__main__":
     col_label = None
     row_label = []
     matrix=[]
-    for line in fin.readlines():
+    for line in fin:
         data = string.split(line.strip(),'\t')
         if col_label is None:
             col_label = data
@@ -55,12 +55,12 @@ if __name__ == "__main__":
     fout.write("\t".join(out) + "\n")
 
     #body
-    for col in range(0, len(col_label)):
+    for col in range(1, len(col_label)):
         out = []
         if label_print:
-            out.append(col_label[col+1])
+            out.append(col_label[col])
         for row in matrix:
-            out.append(str(row[col]))
+            out.append(str(row[col-1]))
         fout.write("\t".join(out) + "\n")
 
     fin.close()
