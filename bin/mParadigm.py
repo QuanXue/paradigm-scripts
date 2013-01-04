@@ -647,6 +647,38 @@ def rCRSData(inf, appendData = {}, delim = "\t", null = "NA", useCols = None, us
     else:
         return(inData)
 
+def wCRSData(outf, outData, delim = "\t", null = "NA", useCols = None, useRows = None):
+    """write [col][row] dictionary to .tsv"""
+    ## get colFeatures and rowFeatures
+    if useCols == None:
+        colFeatures = outData.keys()
+    else:
+        colFeatures = list(useCols)
+    if useRows == None:
+        rowFeatures = []
+        for col in colFeatures:
+            if col in outData:
+                rowFeatures = outData[col].keys()
+                break
+    else:
+        rowFeatures = list(useRows)
+    ## write header
+    if os.path.exists(outf):
+        f = open(outf, "a")
+    else:
+        f = open(outf, "w")
+        f.write("id%s\n" % (delim+delim.join(colFeatures)))
+    ## write data
+    for row in rowFeatures:
+        f.write("%s" % (row))
+        for col in colFeatures:
+            try:
+                f.write("%s" % (delim+str(outData[col][row])))
+            except KeyError:
+                f.write("%s" % (delim+null))
+        f.write("\n")
+    f.close()
+
 def rList(inf, header = False):
     """read 1 column list"""
     inList = []
