@@ -521,17 +521,6 @@ def prepareParadigm(args):
             for b in range(len(dataSamples)):
                 bid = "b%i_%i_" % (b, len(dataSamples))
                 wCRSData("%s/%s" % (dataDir, bid + file), dataMap, useCols = list(set(dataFeatures) & set(pathFeatures)), useRows = [dataSamples[b]])
-            # samples = readFileLineNumber("%s/%s" % (dataDir, file)) - 1
-            # dfile = open("%s/%s" % (dataDir, file), "r")
-            # dheader = dfile.readline()
-            # 
-            # for b in range(samples):
-            #     bid = "b%i_%i_" % (b, samples)
-            #     ofile = open("%s/%s" % (dataDir, bid + file), "w")
-            #     ofile.write(dheader)
-            #     ofile.write(dfile.readline())
-            #     ofile.close()
-            # dfile.close()
 
 if __name__ == "__main__":
     prepareParadigm(sys.argv[1:])
