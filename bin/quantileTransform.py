@@ -39,7 +39,9 @@ def printElapsed(start):
 def py_cmp_float(a_ptr, b_ptr):
     a = a_ptr.contents.value
     b = b_ptr.contents.value
-    return (a > b) - (a < b)
+    if a < b:
+        return -1
+    return a > b
 
 CMPFUNC = ctypes.CFUNCTYPE(ctypes.c_int, ctypes.POINTER(ctypes.c_float), ctypes.POINTER(ctypes.c_float))
 
@@ -93,8 +95,11 @@ def transformFile(fh, sep="\t"):
     printElapsed(startTime)
     
     log("sorting float values...")
-    sortedValues = array.array('f', floatValues) 
-    
+    sortedValues = array.array('f')
+    for f in floatValues:
+        if f == f:
+             sortedValues.append(f)
+             
     csort(sortedValues)
 
     i = 0

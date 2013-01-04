@@ -30,19 +30,34 @@
   --of $file_output_files
 #end if
 #if str($geneExp) != 'None':
+#if $geneExp_pre:
+  mRNA rawTrans:$geneExp
+#else
   mRNA file:$geneExp
+#end if
 #end if 
 #if str($cnv) != 'None':
+#if $cnv_pre:
+  genome rawTrans:$cnv
+#else
   genome file:$cnv
+#end if
 #end if 
 #if str($meth) != 'None':
+#if $meth_pre:
+  meth rawTrans:$meth
+#else
   meth file:$meth
+#end if 
 #end if 
   </command>
   <inputs>
 	  <param name="geneExp" type="data" format="tabular" label="Gene Exp Matrix" optional="true"/>
+    <param name="geneExp_pre" type="boolean" label="Pre-Adjusted Gene Expression Values"/>
 	  <param name="cnv" type="data" format="tabular" label="Copy Number Matrix" optional="true"/>
+    <param name="cnv_pre" type="boolean" label="Pre-Adjusted Copy Number Values"/>
 	  <param name="meth" type="data" format="tabular" label="Methylation Matrix" optional="true"/>
+    <param name="meth_pre" type="boolean" label="Pre-Adjusted Methylation Values"/>
 	  <param name="dogma" type="data" format="zip" label="Dogma Zip File" optional="true"/>
 	  <param name="pathway" type="data" format="zip" label="Pathways Zip File" optional="true"/>
 	  <param name="lower_boundary" type="text" value="0.33" label="Lower Boundary Cutoffs"/>
@@ -51,23 +66,20 @@
 	  <param name="skip_em" type="boolean" label="Skip EM Cycle" checked="false"/>
 	  <param name="lb_max" type="integer" label="Loopy Belief Max Iteration" value="10000"/>
 	  <param name="storedparam" type="data" format="txt" label="Precomputer Parameter File" optional="True"/>
-	  <param name="output" type="boolean" label="Output Unfiltered All" checked="true"/>
 	  <param name="output_params" type="boolean" label="Output Params" checked="false"/>
 	  <param name="output_config" type="boolean" label="Output Config" checked="false"/>
 	  <param name="output_files" type="boolean" label="Output Files" checked="false"/>      
   </inputs>
   <outputs>
-      <data name="file_output" format="tabular" label="Unfiltered All">
-		  <filter>output</filter>
-	  </data>
+      <data name="file_output" format="tabular" label="Unfiltered All"/>
       <data name="file_output_params" format="tabular" label="Params">
-		  <filter>output</filter>
+		  <filter>output_params</filter>
 	  </data>
       <data name="file_output_config" format="tabular" label="Config">
-		  <filter>output</filter>
+		  <filter>output_config</filter>
 	  </data>
       <data name="file_output_files" format="zip" label="Files">
-		  <filter>zip</filter>
+		  <filter>output_files</filter>
 	  </data>
   </outputs>
   <help>

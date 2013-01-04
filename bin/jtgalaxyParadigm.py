@@ -7,9 +7,13 @@ import getopt, os, os.path, re, sys
 from optparse import OptionParser
 from jtParadigm import *
 import shutil
+import logging
 
 from jobTree.scriptTree.target import Target
 from jobTree.scriptTree.stack import Stack
+
+logging.basicConfig(filename="paradigm.log", level=logging.INFO)
+
 
 basedir = os.path.dirname(os.path.abspath(__file__))
 
@@ -75,7 +79,7 @@ def wrapParadigm():
     parser.add_option("--of", "--output-files", dest="output_files", help="Output Files", default=None)
     
     options, args = parser.parse_args()
-    logger.info("options: " + str(options))
+    logging.info("options: " + str(options))
     print "Using Batch System '" + options.batchSystem + "'"
     
     evidList = []
@@ -98,7 +102,10 @@ def wrapParadigm():
     dogmaZip=os.path.abspath(options.dogmazip)
     pathwayZip=os.path.abspath(options.pathwayzip)
     disc=options.disc
-    paramFile=os.path.abspath(options.param) if options.param is not None else None
+    if options.param is not None:
+        paramFile=os.path.abspath(options.param) 
+    else:
+        paramFile=None
     runEM = options.em
     
     if not os.path.exists(workdir):
@@ -109,7 +116,7 @@ def wrapParadigm():
     system("unzip -o %s -d %s" % (pathwayZip, pathwayLib))
 
     ## run
-    logger.info("starting prepare")
+    logging.info("starting prepare")
     argSpec = inferSpec % (options.lb_max)
     s = Stack(prepareParadigm(" ".join(evidList), disc, paramFile, nullBatches, paradigmExec, argSpec, dogmaLib, pathwayLib, runEM, workdir))
     if options.jobFile:
@@ -131,7 +138,7 @@ def wrapParadigm():
                 system("zip -r outputFiles.zip outputFiles")
                 shutil.copy( os.path.join(options.workdir, "outputFiles.zip"), options.output_files)
                 
-            logger.info("Run complete!")
+            logging.info("Run complete!")
             if os.path.exists(".lastjobTree"):
                 system("rm -rf .lastjobTree")
             if os.path.exists(".jobTree"):
