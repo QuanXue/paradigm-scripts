@@ -43,6 +43,7 @@ Options:
 ## Written by: Charles Vaske
 ## Modified by: Sam Ng
 import os, sys, glob, getopt, re, subprocess, math, json
+from mParadigm import *
 
 ###
 ### Experiments to find the path of the currently executing script
@@ -73,6 +74,7 @@ elif os.path.exists("/data/medbook/"):
     publicParadigm = False
 else:
     publicParadigm = True
+publicBatchFix = False
 standardAttach = ["genome", "mRNA", "protein", "active"]
 paradigmExec = "/hive/users/" + os.getenv("USER") + "/bin/paradigm"
 
@@ -305,6 +307,7 @@ def prepareParadigm(args):
     global paradigmExec, dryrun, nullOptions, disc
     global nullBatches, nullBatchSize, paramFile, inference, dogmaDir
     global configTop, configTopEM
+    global publicParadigm, publicBatchFix
     for o, a in opts:
         if o == "-p":
             pathwayDir = a
@@ -413,7 +416,7 @@ def prepareParadigm(args):
             emOut = "outputFilesEM/" + pid + "_learned_parameters.fa"
             jfile.write("%s -p %s -c configEM.txt -b %s/ -e %s\n" % 
                         (paradigmExec, p, dataDir, emOut))
-        else:
+        elif not publicParadigm:
             for b in range(buckets):
                 bpid = "%s_b%i_%i" % (pid, b, buckets)
                 emOut = "outputFilesEM/" + bpid + "_learned_parameters.fa"
@@ -421,7 +424,17 @@ def prepareParadigm(args):
                 c = "%s -p %s -c configEM.txt -b%s/ -e %s -s %i,%i\n" % \
                     (paradigmExec, p, dataDir, emOut, b, buckets)
                 jfile.write(c)
-
+        else:
+            publicBatchFix = True
+            buckets = samples
+            for b in range(buckets):
+                bid = "b%i_%i_" % (b, buckets)
+                bpid = "%s_b%i_%i" % (pid, b, buckets)
+                emOut = "outputFilesEM/" + bpid + "_learned_parameters.fa"
+                out = "outputFilesEM/" + bpid + "_output.fa"
+                c = "%s -p %s -c configEM.txt -b%s/%s -e %s\n" % \
+                    (paradigmExec, p, dataDir, bid, emOut)
+                jfile.write(c)
     jfile.close()
 
     log("writing jobs list\n")
@@ -434,12 +447,22 @@ def prepareParadigm(args):
             out = "outputFiles/" + pid + "_output.fa"
             jfile.write("%s -p %s -c config.txt -b %s/ -o %s\n" % 
                         (paradigmExec, p, dataDir, out))
-        else:
+        elif not publicParadigm:
             for b in range(buckets):
                 bpid = "%s_b%i_%i" % (pid, b, buckets)
                 out = "outputFiles/" + bpid + "_output.fa"
                 c = "%s -p %s -c config.txt -b %s/ -o %s -s %i,%i\n" % \
                     (paradigmExec, p, dataDir, out, b, buckets)
+                jfile.write(c)
+        else:
+            publicBatchFix = True
+            buckets = samples
+            for b in range(buckets):
+                bid = "b%i_%i_" % (b, buckets)
+                bpid = "%s_b%i_%i" % (pid, b, buckets)
+                out = "outputFiles/" + bpid + "_output.fa"
+                c = "%s -p %s -c config.txt -b %s/%s -o %s\n" % \
+                    (paradigmExec, p, dataDir, bid, out)
                 jfile.write(c)
         for b in range(1, 1 + nullBatches):
             if nullBatchSize == "same":
@@ -453,13 +476,24 @@ def prepareParadigm(args):
                 c = "%s -p %s -c config.txt -b %s/na_batch_%i_ -o %s\n" % \
                     (paradigmExec, p, dataDir, b, out)
                 jfile.write(c)
-            else:
+            elif not publicParadigm:
                 for k in range(buckets):
                     bpid = "%s_b%i_%i" % (pid, k, buckets)
                     out = "outputFiles/%s_batch_%s_output.fa" % (bpid, str(b))
                     batch = "%s/na_batch_%i_" % (dataDir, b)
                     c = "%s -p %s -c config.txt -b %s -o %s -s %i,%i\n" % \
                         (paradigmExec, p, batch, out, k, buckets)
+                    jfile.write(c)
+            else:
+                publicBatchFix = True
+                buckets = numNullSamples
+                for k in range(buckets):
+                    bid = "b%i_%i_" % (b, buckets)
+                    bpid = "%s_b%i_%i" % (pid, k, buckets)
+                    out = "outputFiles/%s_batch_%s_output.fa" % (bpid, str(b))
+                    batch = "%s/%sna_batch_%i_" % (dataDir, bid, b)
+                    c = "%s -p %s -c config.txt -b %s -o %s\n" % \
+                        (paradigmExec, p, batch, out)
                     jfile.write(c)
     jfile.close()
     
@@ -469,6 +503,24 @@ def prepareParadigm(args):
         writeBaseParamsFile("params0.txt", evidence)
     
     syscmd("ln -s params0.txt params.txt")
+    
+    if publicBatchFix:
+        log("Batching data for Paradigm\n")
+        pathFeatures = []
+        for file in os.listdir(dataDir):
+            if file.endswith("_pathway.tab"):
+                (pathNodes, pathInteractions) = rPathway("%s/%s" % (dataDir, file))
+                pathFeatures = list(set(pathNodes) | set(pathFeatures))
+        dataFiles = []
+        for file in os.listdir(dataDir):
+            for e in evidence:
+                if file.endswith(e["outputFile"].split("/")[-1]):
+                    dataFiles.append(file)
+        for file in dataFiles:
+            (dataMap, dataComments, dataFeatures, dataSamples) = rCRSData("%s/%s" % (dataDir, file), retFeatures = True)
+            for b in range(len(dataSamples)):
+                bid = "b%i_%i_" % (b, len(dataSamples))
+                wCRSData("%s/%s" % (dataDir, bid + file), dataMap, useCols = list(set(dataFeatures) & set(pathFeatures)), useRows = [dataSamples[b]])
 
 if __name__ == "__main__":
     prepareParadigm(sys.argv[1:])
