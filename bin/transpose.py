@@ -33,7 +33,6 @@ if __name__ == "__main__":
         if col_label is None:
             col_label = data
         else:
-            row_label.append(data[0])
             if use_float:
                 o = array.array('f')
                 for i in data[1:]:
