@@ -1,7 +1,6 @@
 <tool id="filter_paradigm" name="Filter Paradigm" version="1.0.0">
   <description>Filter Paradigm</description>
   <command interpreter="python">filterParadigm.py 
--w ./
 #if $filtered_all:
   --fa $file_filtered_all
 #end if
@@ -20,13 +19,13 @@ $paradigm
 	  <param name="unfiltered_real" type="boolean" label="Output UnFiltered Real" checked="false"/>
   </inputs>
   <outputs>
-      <data name="file_filtered_real" format="tabular">
+      <data name="file_filtered_real" label="Filtered Real" format="tabular">
 		  <filter>filtered_real</filter>
 	  </data>
-      <data name="file_filtered_all" format="tabular">
+      <data name="file_filtered_all" label="Filtered All" format="tabular">
 		   <filter>filtered_all</filter>
 	  </data>
-      <data name="file_unfiltered_real" format="tabular">
+      <data name="file_unfiltered_real" label="Unfiltered Real" format="tabular">
 		   <filter>unfiltered_real</filter>
 	  </data>
   </outputs>
