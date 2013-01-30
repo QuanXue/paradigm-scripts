@@ -3,13 +3,13 @@
   <command interpreter="python">filterParadigm.py 
 -w ./
 #if $filtered_all:
-  -fa $file_filtered_all
+  --fa $file_filtered_all
 #end if
 #if $filtered_real:
-  -fr $file_filtered_real
+  --fr $file_filtered_real
 #end if
 #if $unfiltered_real:
-  -ur $file_unfiltered_real
+  --ur $file_unfiltered_real
 #end if
 $paradigm
   </command>
