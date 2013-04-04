@@ -74,7 +74,7 @@ class NamedMatrix(dict):
         for row in self.keys():
             data = self[row]
             data.append(float("nan"))
-            self[row] = [data[col] for col in colOrder]
+            self[row] = array.array('f', [data[col] for col in colOrder])
         self.__setColNames(columnList)
     def describe(self):
         print "%i rows, %i columns" % (len(self.keys()), len(self._colnames))
