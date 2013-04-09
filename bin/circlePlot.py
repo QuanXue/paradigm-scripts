@@ -9,12 +9,13 @@ Options:
   -f str        list file containing features to include
   -o str        feature;file[,file ...] or feature
   -c str        file to use as center colors
+  -r str        have the outer ring multi-colored: tab-sep file defines the color mappings (1.0 255.0.0, 0.9 0.255.0...)
   -l            print the feature identifier in the circle or not (default: FALSE)
   -q            run quietly
 """
 ## Written By: Steve Benz and Zack Sanborn
-## Modified By: Sam Ng
-## Last Updated: 10/10/2011
+## Modified By: Sam Ng, Evan Paull
+## Last Updated: 04/09/2013
 import getopt, math, os, sys, re
 from matplotlib import *
 use('Agg')
@@ -51,6 +52,38 @@ class rgb:
         b = self.b
         hexchars = "0123456789ABCDEF"
         return "#" + hexchars[r / 16] + hexchars[r % 16] + hexchars[g / 16] + hexchars[g % 16] + hexchars[b / 16] + hexchars[b % 16]
+
+def parseColorMap(file):
+
+    map = {}
+    for line in open(file):
+        # third column may be a comment: ignore it
+        parts = line.rstrip().split("\t")
+        value = parts[0]
+        try:
+            value = float(value)
+        except:
+            raise Exception("Error: color map file not in proper format")
+
+        rgb = parts[1]
+        map[value] = rgb.split(".")
+
+    return map
+
+def getColorFromColorMap(val, color_map):
+
+    col = None
+    # must be a value here
+    try:
+        val = float(val)
+    except:
+        raise ValueError
+
+    col = rgb(int(color_map[val][0]), int(color_map[val][1]), int(color_map[val][2]))
+
+    return col.tohex()
+    
+
 
 def usage(code = 0):
     print __doc__
@@ -213,7 +246,7 @@ def plotCircle(imgFile, label = "", centerCol = rgb(255, 255, 255).tohex(), circ
 def main(args):
     ## parse arguments
     try:
-        opts, args = getopt.getopt(args, "s:f:o:c:lq")
+        opts, args = getopt.getopt(args, "s:f:o:c:r:lq")
     except getopt.GetoptError, err:
         print str(err)
         usage(2)
@@ -228,6 +261,7 @@ def main(args):
     orderFeature = None
     centerFile = None
     printLabel = False
+    colorMap = None
     global verbose
     for o, a in opts:
         if o == "-s":
@@ -248,6 +282,9 @@ def main(args):
             printLabel = True
         elif o == "-q":
             verbose = False
+        elif o == "-r":
+            colorMapFile = a
+            colorMap = parseColorMap(colorMapFile)
     
     ## execute
     samples = []
@@ -382,7 +419,10 @@ def main(args):
             maxVal = max([0.01]+floatList(ringVals))
             for sample in samples:
                 if sample in circleData[i]:
-                    if feature in circleData[i][sample]:
+                    # redirect to multi-color code if we're on the outermost ring, if we're using the option
+                    if colorMap and i == (len(circleData)-1):
+                        ringCols.append(getColorFromColorMap(circleData[i][sample][feature], colorMap))
+                    elif feature in circleData[i][sample]:
                         if type(circleColors[i]) is TupleType:
                             ringCols.append(getColor(circleData[i][sample][feature], minVal, maxVal, minColor = circleColors[i][0], zeroColor = circleColors[i][1], maxColor = circleColors[i][2]))
                         else:
