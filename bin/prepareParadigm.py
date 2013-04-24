@@ -214,6 +214,8 @@ def writeBaseParamsFile(pfilename, evidence, storedParams = {}):
     pfile.close()
 
 def readPathwayTiming(directory):
+    if not os.path.exists(directory + "/timings.tab"):
+        return {}
     tfile = open(directory + "/timings.tab", "r")
     samplesline = tfile.readline().rstrip();
     m = re.search('^#\s*samples\s*(\d+)\s*', samplesline)

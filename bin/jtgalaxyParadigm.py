@@ -17,8 +17,10 @@ logging.basicConfig(filename="paradigm.log", level=logging.INFO)
 
 basedir = os.path.dirname(os.path.abspath(__file__))
 
-basedogma = os.path.join(basedir, "d_standard.zip")
-basepathway = os.path.join(basedir, "p_global_five3_v2.zip")
+basedogma = os.path.join(basedir, "standard.dogma")
+baseimap = os.path.join(basedir, "standard.imap")
+baseparams = os.path.join(basedir, "params0.txt")
+basepathway = os.path.join(basedir, "pid_110725_pathway.tab")
 
 paradigmExec = os.path.join(basedir, "paradigm")
 prepareExec = os.path.join(basedir, "prepareParadigm.py")
@@ -66,10 +68,12 @@ def wrapParadigm():
                       "than making a new jobTree")
     parser.add_option("-w", "--workdir", dest="workdir", help="Common Work directory", default="./")
     parser.add_option("-n", "--nulls", dest="nulls", help="Number of Null Samples", default="5")
-    parser.add_option("-d", "--dogma", dest="dogmazip", help="Path to PARADIGM Dogma Specification", default=basedogma)
-    parser.add_option("-p", "--pathway", dest="pathwayzip", help="Path to PARADIGM Pathway Specification", default=basepathway)
+    parser.add_option("-d", "--dogma", dest="dogma", help="Path to PARADIGM Dogma Specification", default=basedogma)
+    parser.add_option("-i", "--imap", dest="imap", help="Path to PARADIGM Interaction Map Specification", default=baseimap)
+    parser.add_option("-t", "--param", dest="param", help="Initial Parameter Starting Point", default=baseparams)
+    
+    parser.add_option("-p", "--pathway", dest="pathway", help="Path to PARADIGM Pathway Specification", default=basepathway)
     parser.add_option("-b", "--boundaries", dest="disc", help="Data Discretization Bounds", default="0.33;0.67")
-    parser.add_option("-t", "--storedparam", dest="param", help="Initial Parameter Starting Point", default=None)
     parser.add_option("-s", "--skipem", action="store_false", dest="em", help="Skip Running EM", default=True)
     parser.add_option("--lb-max", dest="lb_max", help="Loopy Belief Max iterations", default=10000)
     
@@ -99,21 +103,24 @@ def wrapParadigm():
     if not os.path.exists(workdir):
         os.makedirs(workdir)
     nullBatches = int(options.nulls)
-    dogmaZip=os.path.abspath(options.dogmazip)
-    pathwayZip=os.path.abspath(options.pathwayzip)
+    dogma = os.path.abspath(options.dogma)
+    pathway = os.path.abspath(options.pathway)
+    imap = os.path.abspath(options.imap)
+    params = os.path.abspath(options.param)
     disc=options.disc
-    if options.param is not None:
-        paramFile=os.path.abspath(options.param) 
-    else:
-        paramFile=None
+    paramFile=os.path.abspath(options.param) 
     runEM = options.em
     
     if not os.path.exists(workdir):
         os.makedirs(workdir)
     dogmaLib = os.path.join(workdir, "dogma")
     pathwayLib = os.path.join(workdir, "pathway")
-    system("unzip -o %s -d %s" % (dogmaZip, dogmaLib))
-    system("unzip -o %s -d %s" % (pathwayZip, pathwayLib))
+    os.makedirs(dogmaLib)
+    os.makedirs(pathwayLib)
+    shutil.copy(dogma, dogmaLib)
+    shutil.copy(imap, dogmaLib)
+    shutil.copy(pathway, pathwayLib)
+
 
     ## run
     logging.info("starting prepare")
