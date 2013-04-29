@@ -27,7 +27,7 @@ prepareExec = os.path.join(basedir, "prepareParadigm.py")
 inferSpec = "method=BP,updates=SEQFIX,tol=1e-9,maxiter=%s,logdomain=0"
 
 class prepareParadigm(Target):
-    def __init__(self, evidSpec, disc, paramFile, nullBatches, paradigmExec, inferSpec, dogmaLib, pathwayLib, em, directory):
+    def __init__(self, evidSpec, disc, paramFile, nullBatches, paradigmExec, inferSpec, dogmaLib, pathwayLib, em, directory, private_paradigm):
         Target.__init__(self, time=10000)
         self.evidSpec = evidSpec
         self.disc = disc
@@ -39,12 +39,21 @@ class prepareParadigm(Target):
         self.pathwayLib = pathwayLib
         self.em = em
         self.directory = directory
+        self.private_paradigm = private_paradigm
+        
     def run(self):
         os.chdir(self.directory)
+        private_flag = ""
+        if self.private_paradigm:
+            private_flag = "-z"
+        
         if self.paramFile is not None:
-            cmd = "%s %s -b \"%s\" -t %s -s same -n %s -i %s -e %s -d %s -p %s %s " % (sys.executable, prepareExec, self.disc, self.paramFile, self.nullBatches, self.inferSpec, self.paradigmExec, self.dogmaLib, self.pathwayLib, self.evidSpec)
+            cmd = "%s %s -b \"%s\" -t %s -s same -n %s -i %s -e %s -d %s -p %s %s %s " % (sys.executable, prepareExec, self.disc, self.paramFile, self.nullBatches, self.inferSpec, self.paradigmExec, self.dogmaLib, self.pathwayLib, private_flag, self.evidSpec)
         else:
-            cmd = "%s %s -b \"%s\" -s same -n %s -i %s -e %s -d %s -p %s %s " % (sys.executable, prepareExec, self.disc, self.nullBatches, self.inferSpec, self.paradigmExec, self.dogmaLib, self.pathwayLib, self.evidSpec)
+            cmd = "%s %s -b \"%s\" -s same -n %s -i %s -e %s -d %s -p %s %s %s " % (sys.executable, prepareExec, self.disc, self.nullBatches, self.inferSpec, self.paradigmExec, self.dogmaLib, self.pathwayLib, private_flag, self.evidSpec)
+        handle=open("prepare.log", "w")
+        handle.write(cmd)
+        handle.close()
         system(cmd)
         self.setFollowOnTarget(jtParadigm(self.em, self.directory))
 
@@ -77,10 +86,13 @@ def wrapParadigm():
     parser.add_option("-s", "--skipem", action="store_false", dest="em", help="Skip Running EM", default=True)
     parser.add_option("--lb-max", dest="lb_max", help="Loopy Belief Max iterations", default=10000)
     
-    parser.add_option("-o", "--output", dest="output_paradigm", help="Unfiltered Output", default=None)
+    parser.add_option("-o", "--output", dest="output_paradigm", help="Unfiltered Output", default="paradigm.output")
     parser.add_option("--op", "--output-params", dest="output_params", help="Parameter Output", default=None)
     parser.add_option("--oc", "--output-config", dest="output_config", help="Config Output", default=None)
     parser.add_option("--of", "--output-files", dest="output_files", help="Output Files", default=None)
+
+    parser.add_option("-z", dest="private_paradigm", help="This is such bullshit", action="store_true", default=False)
+
     
     options, args = parser.parse_args()
     logging.info("options: " + str(options))
@@ -125,7 +137,12 @@ def wrapParadigm():
     ## run
     logging.info("starting prepare")
     argSpec = inferSpec % (options.lb_max)
-    s = Stack(prepareParadigm(" ".join(evidList), disc, paramFile, nullBatches, paradigmExec, argSpec, dogmaLib, pathwayLib, runEM, workdir))
+    s = Stack(prepareParadigm(evidSpec=" ".join(evidList), disc=disc, 
+        paramFile=paramFile, nullBatches=nullBatches, 
+        paradigmExec=paradigmExec, inferSpec=argSpec, 
+        dogmaLib=dogmaLib, pathwayLib=pathwayLib, em=runEM, directory=workdir,
+        private_paradigm=options.private_paradigm
+        ))
     if options.jobFile:
         s.addToJobFile(options.jobFile)
     else:
