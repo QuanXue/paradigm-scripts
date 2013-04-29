@@ -66,22 +66,10 @@ dataDir = "clusterFiles"
 #outputDir = "outputFiles"
 
 verbose = True
-if os.path.exists("/hive/groups/cancerGB/paradigm/exe/newEmSpec/paradigm"):
-    publicParadigm = False
-elif os.path.exists("/inside/grotto/users/sng/bin/Paradigm/paradigm"):
-    publicParadigm = False
-elif os.path.exists("/data/medbook/"):
-    publicParadigm = False
-else:
-    publicParadigm = True
+publicParadigm = True
 publicBatchFix = False
 standardAttach = ["genome", "mRNA", "protein", "active"]
-paradigmExec = "/hive/users/" + os.getenv("USER") + "/bin/paradigm"
-
-if publicParadigm:
-    newSpecStyle = False
-else:
-    newSpecStyle = True
+paradigmExec = os.path.join(os.path.abspath(os.path.dirname(__file__)), "paradigm")
 
 dryrun = False
 
@@ -153,7 +141,7 @@ def initParams(numBins, reverse=False):
     zero = [str(v) for v in zero]
     down = [v for v in up]
     down.reverse()
-    if newSpecStyle:
+    if not publicParadigm:
         return "\n".join(down + zero + up) + "\n"
     else:
         paramLines = ""
@@ -187,13 +175,12 @@ def writeBaseParamsFile(pfilename, evidence, storedParams = {}):
         pfile.write(paramHeader)
     for e in evidence:
         bins = len(e["disc"].split(";")) + 1
-        global newSpecStyle
-        if newSpecStyle:
+        if not publicParadigm:
             spec = e["attachment"]
         else:
             spec = "-obs>"
         if e["attachment"] != "codeMut":
-            if newSpecStyle:
+            if not publicParadigm:
                 pfile.write("> shared CondProbEstimation [pseudo_count=1,target_dim=%i,total_dim=%i] %s=%s\n" % (bins, 3*bins, e["suffix"], e["attachment"]))
                 if e["attachment"] in storedParams:
                     pfile.write(storedParams[e["attachment"]])
@@ -214,6 +201,8 @@ def writeBaseParamsFile(pfilename, evidence, storedParams = {}):
     pfile.close()
 
 def readPathwayTiming(directory):
+    if not os.path.exists(directory + "/timings.tab"):
+        return {}
     tfile = open(directory + "/timings.tab", "r")
     samplesline = tfile.readline().rstrip();
     m = re.search('^#\s*samples\s*(\d+)\s*', samplesline)
@@ -229,7 +218,7 @@ def readPathwayTiming(directory):
 
 def numBuckets(pathway, samples, timings, targetLength):
     if pathway not in timings:
-        return 1
+        return samples
     length = timings[pathway] * samples
     return min(int(math.ceil(length / targetLength)), samples)
 
@@ -293,9 +282,9 @@ def mkdir(dirname):
             sys.exit(1)
 
 def prepareParadigm(args):
-    pathwayDir = '/hive/groups/cancerGB/paradigm/pathwayfiles/v1'
+    pathwayDir = None
     try:
-        opts, args = getopt.getopt(args, "p:n:e:qc:b:s:t:i:d:")
+        opts, args = getopt.getopt(args, "p:n:e:qc:b:s:t:i:d:z")
     except getopt.GetoptError, err:
         print str(err)
         usage(2)
@@ -311,6 +300,8 @@ def prepareParadigm(args):
     for o, a in opts:
         if o == "-p":
             pathwayDir = a
+        elif o == "-z":
+            publicParadigm = False
         elif o == "-d":
             dogmaDir = a
             fn = os.path.join(dogmaDir, "configTop")
@@ -373,7 +364,7 @@ def prepareParadigm(args):
     if not publicParadigm:
         confFile.write("# " + " ".join(sys.argv) + "\n")
     confFile.write(configTopEM % inference)
-    if newSpecStyle:
+    if not publicParadigm:
         confFile.write(",".join([e["suffix"] + "=" + e["attachment"]
                                  for e in evidence]))
     else:
