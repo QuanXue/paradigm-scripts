@@ -29,7 +29,7 @@ if __name__ == "__main__":
     row_label = []
     matrix=[]
     for line in fin:
-        data = string.split(line.strip(),'\t')
+        data = string.split(line.rstrip("\n\r"),'\t')
         if col_label is None:
             col_label = data
         else:
