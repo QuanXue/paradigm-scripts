@@ -1,6 +1,6 @@
 <tool id="paradigm" name="Paradigm" version="1.1.1">
   <description>Paradigm</description>
-  <command interpreter="python">jtgalaxyParadigm.py 
+  <command interpreter="python">jtgalaxyParadigm.py -z
 #if str($dogma) != 'None':
   --dogma $dogma
 #end if

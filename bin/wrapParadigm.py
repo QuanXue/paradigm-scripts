@@ -32,7 +32,7 @@ paradigmExec = "%s/paradigm" % (exeDir)
 inferSpec = "method=BP,updates=SEQFIX,tol=1e-9,maxiter=10000,logdomain=0"
 
 class prepareParadigm(Target):
-    def __init__(self, evidSpec, disc, paramFile, nullBatches, paradigmExec, inferSpec, dogmaLib, pathwayLib, em, directory):
+    def __init__(self, evidSpec, disc, paramFile, nullBatches, paradigmExec, inferSpec, dogmaLib, pathwayLib, em, private_paradigm, directory):
         Target.__init__(self, time=10000)
         self.evidSpec = evidSpec
         self.disc = disc
@@ -44,12 +44,16 @@ class prepareParadigm(Target):
         self.pathwayLib = pathwayLib
         self.em = em
         self.directory = directory
+        self.private_paradigm = private_paradigm
     def run(self):
         os.chdir(self.directory)
+        private_arg = ""
+        if self.private_paradigm:
+            private_arg = "-z"
         if self.paramFile is not None:
-            cmd = "prepareParadigm.py -b \"%s\" -t %s -s same -n %s -i %s -e %s -d %s -p %s %s >& jt.err" % (self.disc, self.paramFile, self.nullBatches, self.inferSpec, self.paradigmExec, self.dogmaLib, self.pathwayLib, self.evidSpec)
+            cmd = "prepareParadigm.py -b \"%s\" -t %s -s same -n %s -i %s -e %s -d %s -p %s %s %s >& jt.err" % (self.disc, self.paramFile, self.nullBatches, self.inferSpec, self.paradigmExec, self.dogmaLib, self.pathwayLib, private_arg, self.evidSpec)
         else:
-            cmd = "prepareParadigm.py -b \"%s\" -s same -n %s -i %s -e %s -d %s -p %s %s >& jt.err" % (self.disc, self.nullBatches, self.inferSpec, self.paradigmExec, self.dogmaLib, self.pathwayLib, self.evidSpec)
+            cmd = "prepareParadigm.py -b \"%s\" -s same -n %s -i %s -e %s -d %s -p %s %s %s >& jt.err" % (self.disc, self.nullBatches, self.inferSpec, self.paradigmExec, self.dogmaLib, self.pathwayLib, private_arg, self.evidSpec)
         system(cmd)
         self.setFollowOnTarget(jtParadigm(self.em, self.directory))
 
@@ -77,6 +81,7 @@ def wrapParadigm():
     parser.add_option("-n", "--nulls", dest="nullBatches", help="Number of Null Samples", default="5")
     parser.add_option("-t", "--storedparam", dest="paramFile", help="Initial Parameter Starting Point", default="")
     parser.add_option("-s", "--skipem", action="store_false", dest="runEM", help="Skip Running EM", default=True)
+    parser.add_option("-z", dest="private_paradigm", action="store_true", default=False)
     options, args = parser.parse_args()
     print "Using Batch System '" + options.batchSystem + "'"
    
@@ -113,7 +118,21 @@ def wrapParadigm():
     
     ## run
     logger.info("starting prepare")
-    s = Stack(prepareParadigm(" ".join(evidList), disc, paramFile, nullBatches, paradigmExec, inferSpec, dogma, pathway, runEM, os.getcwd()))
+    s = Stack(
+        prepareParadigm(
+            evidSpec=" ".join(evidList), 
+            disc=disc, 
+            paramFile=paramFile, 
+            nullBatches=nullBatches, 
+            paradigmExec=paradigmExec, 
+            inferSpec=inferSpec, 
+            dogmaLib=dogma, 
+            pathwayLib=pathway, 
+            em=runEM,
+            private_paradigm=options.private_paradigm,
+            directory=os.getcwd()
+        )
+    )
     if options.jobFile:
         s.addToJobFile(options.jobFile)
     else:

@@ -493,6 +493,8 @@ def prepareParadigm(args):
     else:
         writeBaseParamsFile("params0.txt", evidence)
     
+    if os.path.exists("params.txt"):
+        os.unlink("params.txt")
     syscmd("ln -s params0.txt params.txt")
     
     if publicBatchFix:

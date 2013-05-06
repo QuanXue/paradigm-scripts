@@ -4,6 +4,7 @@ Written By: Sam Ng
 """
 import re, sys, os
 from copy import deepcopy
+import array
 
 class Pathway:
     def __init__(self, nodes, interactions, pid = None):
@@ -577,7 +578,7 @@ def shortestPath(source, target, interactions):
         allPaths = deepcopy(nextPaths)
     return (shortestPaths)
 
-def rCRSData(inf, appendData = {}, delim = "\t", null = "NA", useCols = None, useRows = None, retFeatures = False, debug = False):
+def rCRSData(inf, appendData = {}, delim = "\t", useCols = None, useRows = None, retFeatures = False, debug = False):
     """reads .tsv into a [col][row] dictionary"""
     inData = {}
     inComments = []
@@ -632,11 +633,15 @@ def rCRSData(inf, appendData = {}, delim = "\t", null = "NA", useCols = None, us
             log("ERROR: length of line does not match the rest of the file\n", die = True)
         for col in colFeatures:
             if row not in inData[col]:
-                inData[col][row] = []
+                inData[col][row] = array.array("f")
             if pline[colIndex[col]+1] == "":
-                inData[col][row].append(null)
+                inData[col][row].append(float('nan'))
             else:            
-                inData[col][row].append(pline[colIndex[col]+1])
+                try:
+                    val = float(pline[colIndex[col]+1])
+                except ValueError:
+                    val = float('nan')
+                inData[col][row].append(val)
     f.close()
     ## average entries
     for col in inData.keys():
@@ -670,6 +675,7 @@ def wCRSData(outf, outData, delim = "\t", null = "NA", useCols = None, useRows =
         f.write("id%s\n" % (delim+delim.join(colFeatures)))
     ## write data
     for row in rowFeatures:
+        """
         f.write("%s" % (row))
         for col in colFeatures:
             try:
@@ -677,6 +683,11 @@ def wCRSData(outf, outData, delim = "\t", null = "NA", useCols = None, useRows =
             except KeyError:
                 f.write("%s" % (delim+null))
         f.write("\n")
+        """
+        out = [row]
+        for col in colFeatures:
+            out.append(str(outData[col].get(row, null)))
+        f.write("%s\n" % (delim.join(out)))
     f.close()
 
 def rList(inf, header = False):
@@ -727,9 +738,16 @@ def floatList(inList):
 
 def mean(inList, null = "NA"):
     """Calculates mean"""
+    """
     fList = floatList(inList)
     if len(fList) == 0:
         mean = null
     else:
         mean = sum(fList)/len(fList)
     return (mean)
+    """
+    if len(inList) == 0:
+        mean = float('nan')
+    else:
+        mean = sum(inList)/float(len(inList))
+    return mean
