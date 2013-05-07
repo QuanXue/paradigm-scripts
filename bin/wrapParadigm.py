@@ -81,7 +81,7 @@ def wrapParadigm():
     parser.add_option("-n", "--nulls", dest="nullBatches", help="Number of Null Samples", default="5")
     parser.add_option("-t", "--storedparam", dest="paramFile", help="Initial Parameter Starting Point", default="")
     parser.add_option("-s", "--skipem", action="store_false", dest="runEM", help="Skip Running EM", default=True)
-    parser.add_option("-z", dest="private_paradigm", action="store_true", default=False)
+    parser.add_option("-y", dest="public_paradigm", action="store_true", help="Use public binary version", default=False)
     options, args = parser.parse_args()
     print "Using Batch System '" + options.batchSystem + "'"
    
@@ -129,7 +129,7 @@ def wrapParadigm():
             dogmaLib=dogma, 
             pathwayLib=pathway, 
             em=runEM,
-            private_paradigm=options.private_paradigm,
+            private_paradigm=not options.public_paradigm,
             directory=os.getcwd()
         )
     )
