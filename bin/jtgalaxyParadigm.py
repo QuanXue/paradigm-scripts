@@ -22,6 +22,7 @@ baseimap = os.path.join(basedir, "standard.imap")
 baseparams = os.path.join(basedir, "params0.txt")
 basepathway = os.path.join(basedir, "pid_110725_pathway.tab")
 
+xgmmlExec = os.path.join(basedir, "xgmml2paradigm.py")
 paradigmExec = os.path.join(basedir, "paradigm")
 prepareExec = os.path.join(basedir, "prepareParadigm.py")
 inferSpec = "method=BP,updates=SEQFIX,tol=1e-9,maxiter=%s,logdomain=0"
@@ -81,6 +82,7 @@ def wrapParadigm():
     parser.add_option("-i", "--imap", dest="imap", help="Path to PARADIGM Interaction Map Specification", default=baseimap)
     parser.add_option("-t", "--param", dest="param", help="Initial Parameter Starting Point", default=baseparams)
     
+    parser.add_option("--xgmml", dest="xgmml", help="Path to PARADIGM Pathway XGMML file", default=None)
     parser.add_option("-p", "--pathway", dest="pathway", help="Path to PARADIGM Pathway Specification", default=basepathway)
     parser.add_option("-b", "--boundaries", dest="disc", help="Data Discretization Bounds", default="0.33;0.67")
     parser.add_option("-s", "--skipem", action="store_false", dest="em", help="Skip Running EM", default=True)
@@ -116,7 +118,6 @@ def wrapParadigm():
         os.makedirs(workdir)
     nullBatches = int(options.nulls)
     dogma = os.path.abspath(options.dogma)
-    pathway = os.path.abspath(options.pathway)
     imap = os.path.abspath(options.imap)
     params = os.path.abspath(options.param)
     disc=options.disc
@@ -131,7 +132,13 @@ def wrapParadigm():
     os.makedirs(pathwayLib)
     shutil.copy(dogma, dogmaLib)
     shutil.copy(imap, dogmaLib)
-    shutil.copy(pathway, pathwayLib)
+
+    if options.xgmml:
+        pathway = os.path.join(pathwayLib, "pid_tmp_pathway.tab")
+        system("%s %s %s %s" % (sys.executable, xgmmlExec, options.xgmml, pathway))
+    else:
+        pathway = os.path.abspath(options.pathway)
+        shutil.copy(pathway, pathwayLib)
 
 
     ## run
