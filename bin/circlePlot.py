@@ -9,13 +9,13 @@ Options:
   -f str        list file containing features to include
   -o str        feature;file[,file ...] or feature
   -c str        file to use as center colors
-  -r str        have the outer ring multi-colored: tab-sep file defines the color mappings (1.0 255.0.0, 0.9 0.255.0...)
+  -r str        color mapping file: tab-sep file defines the color mappings (1.0 255.0.0, 0.9 0.255.0...)
   -l            print the feature identifier in the circle or not (default: FALSE)
   -q            run quietly
 """
 ## Written By: Steve Benz and Zack Sanborn
 ## Modified By: Sam Ng, Evan Paull
-## Last Updated: 04/09/2013
+## Last Updated: 04/30/2013
 import getopt, math, os, sys, re
 from matplotlib import *
 use('Agg')
@@ -26,6 +26,24 @@ from mParadigm import *
 
 verbose = True
 tstep = 0.01
+
+def usage(code = 0):
+    print __doc__
+    if code != None: sys.exit(code)
+
+def log(msg, die = False):
+    if verbose:
+        sys.stderr.write(msg)
+    if die:
+        sys.exit(1)
+
+def syscmd(cmd):
+    log("running:\n\t"+cmd+"\n")
+    exitstatus = os.system(cmd)
+    if exitstatus != 0:
+        print "Failed with exit status %i" % exitstatus
+        sys.exit(10)
+    log("... done\n")
 
 class rgb:
     def __init__(self,r,g,b):
@@ -54,9 +72,14 @@ class rgb:
         return "#" + hexchars[r / 16] + hexchars[r % 16] + hexchars[g / 16] + hexchars[g % 16] + hexchars[b / 16] + hexchars[b % 16]
 
 def parseColorMap(file):
-
+    # by default ringIndex is the outer ring if not declared
+    ringIndex = -1
     map = {}
     for line in open(file):
+        # a ring index of 0 refers to the center, 1 is the first ring, and -1 is the last
+        if line.startswith(">"):
+            ringIndex = int(line.lstrip(">"))
+            continue
         # third column may be a comment: ignore it
         parts = line.rstrip().split("\t")
         value = parts[0]
@@ -64,44 +87,12 @@ def parseColorMap(file):
             value = float(value)
         except:
             raise Exception("Error: color map file not in proper format")
-
+        
         rgb = parts[1]
-        map[value] = rgb.split(".")
-
+        if ringIndex not in map:
+            map[ringIndex] = {}
+        map[ringIndex][value] = rgb.split(".")
     return map
-
-def getColorFromColorMap(val, color_map):
-
-    col = None
-    # must be a value here
-    try:
-        val = float(val)
-    except:
-        raise ValueError
-
-    col = rgb(int(color_map[val][0]), int(color_map[val][1]), int(color_map[val][2]))
-
-    return col.tohex()
-    
-
-
-def usage(code = 0):
-    print __doc__
-    if code != None: sys.exit(code)
-
-def log(msg, die = False):
-    if verbose:
-        sys.stderr.write(msg)
-    if die:
-        sys.exit(1)
-
-def syscmd(cmd):
-    log("running:\n\t"+cmd+"\n")
-    exitstatus = os.system(cmd)
-    if exitstatus != 0:
-        print "Failed with exit status %i" % exitstatus
-        sys.exit(10)
-    log("... done\n")
 
 def scmp(a, b, feature, dataList):
     dataFeature = feature
@@ -124,11 +115,17 @@ def scmp(a, b, feature, dataList):
             return(0)
     return(val)
 
-def polar(r, val):
-    theta = -2.0 * math.pi * val + math.pi/2.0
-    x = r * math.cos(theta)
-    y = r * math.sin(theta)
-    return x, y
+def getColorFromColorMap(val, colorMap):
+    col = None
+    # must be a value here
+    try:
+        val = float(val)
+    except:
+        raise ValueError
+
+    col = rgb(int(colorMap[val][0]), int(colorMap[val][1]), int(colorMap[val][2]))
+    return col.tohex()
+    
 
 def getColor(val, minVal, maxVal, minColor = rgb(0, 0, 255), zeroColor = rgb(255, 255, 255), maxColor = rgb(255, 0, 0)):
     try:
@@ -158,6 +155,12 @@ def getColor(val, minVal, maxVal, minColor = rgb(0, 0, 255), zeroColor = rgb(255
     except ValueError:
         col = rgb(200,200,200)
     return col.tohex()
+
+def polar(r, val):
+    theta = -2.0 * math.pi * val + math.pi/2.0
+    x = r * math.cos(theta)
+    y = r * math.sin(theta)
+    return x, y
 
 def plotScale(imgFile, minVal, maxVal):
     imgSize = (2, 4)
@@ -269,24 +272,24 @@ def main(args):
         elif o == "-f":
             featureFile = a
         elif o == "-o":
-            sa = re.split(";", a)
-            if len(sa) == 1:
-                orderFeature = sa[0]
+            parts = a.split(";")
+            if len(parts) == 1:
+                orderFeature = parts[0]
                 orderFiles = []
             else:
-                orderFeature = sa[0]
-                orderFiles = re.split(",", sa[1])
+                orderFeature = parts[0]
+                orderFiles = parts[1].split(",")
         elif o == "-c":
             centerFile = a
+        elif o == "-r":
+            colorMapFile = a
+            colorMap = parseColorMap(colorMapFile)
         elif o == "-l":
             printLabel = True
         elif o == "-q":
             verbose = False
-        elif o == "-r":
-            colorMapFile = a
-            colorMap = parseColorMap(colorMapFile)
     
-    ## execute
+    ## read sample and feature includes
     samples = []
     features = []
     if sampleFile != None:
@@ -294,58 +297,36 @@ def main(args):
     if featureFile != None:
         features = rList(featureFile)
     
+    ## read centerFile
+    centerData = None
+    if centerFile != None:
+        centerData = r2Col(centerFile, header = True)
+    
     ## read circleFiles
     circleData = []
-    circleColors = []
     for i in range(len(circleFiles)):
-        (data, headers, cols, rows) = rCRSData(circleFiles[i], retFeatures = True)
-        circleData.append(data)
-        if len(headers) == 0:
-            minCol = rgb(0, 0, 255)
-            zerCol = rgb(255, 255, 255)
-            maxCol = rgb(255, 0, 0)
-            circleColors.append( (minCol, zerCol, maxCol) )
+        if featureFile != None:
+            (data, headers, cols, rows) = rCRSData(circleFiles[i], retFeatures = True, useRows = ["*"]+features)
         else:
-            paramMap = {}
-            for element in headers[0].split(" "):
-                (paramItem, paramColor) = element.split("=")
-                paramRGB = paramColor.split(",")
-                paramMap[paramItem] = rgb(int(paramRGB[0]), int(paramRGB[1]), int(paramRGB[2]))
-            if ("minCol" in paramMap) or ("zerCol" in paramMap) or ("maxCol" in paramMap):
-                if "minCol" in paramMap:
-                    minCol = paramMap["minCol"]
-                else:
-                    minCol = rgb(0, 0, 255)
-                if "zerCol" in paramMap:
-                    zerCol = paramMap["zerCol"]
-                else:
-                    zerCol = rgb(255, 255, 255)
-                if "maxCol" in paramMap:
-                    maxCol = paramMap["maxCol"]
-                else:
-                    maxCol = rgb(255, 0, 0)
-                circleColors.append( (minCol, zerCol, maxCol) )
-            else:
-                circleColors.append(paramMap)
+            (data, headers, cols, rows) = rCRSData(circleFiles[i], retFeatures = True)
+        circleData.append(data)
         if sampleFile == None:
             samples = list(set(cols) | set(samples))
         if featureFile == None:
             features = list(set(rows) | set(features))
     
-    ## read centerFile
-    centerData = None
-    if centerFile != None:
-        centerData = r2Col(centerFile, header = True)
-        
     ## sort
     if orderFeature != None:
         if len(orderFiles) > 0:
             orderData = []
             orderColors = []
             for i in range(len(orderFiles)):
-                orderData.append(rCRSData(orderFiles[i]))
+                if featureFile != None:
+                    orderData.append(rCRSData(orderFiles[i], useRows = ["*"]+features))
+                else:
+                    orderData.append(rCRSData(orderFiles[i]))
                 minCol = rgb(255, 255, 255)
-                zerCol = rgb(255, 255, 255)
+                zerCol = rgb(200, 200, 200)
                 maxCol = rgb(0, 0, 0)
                 orderColors.append( (minCol, zerCol, maxCol) )
         else:
@@ -407,6 +388,7 @@ def main(args):
                 log("\t%s,%s,%s,%s\n" % (centerData[feature],minVal,maxVal,centerCol))
         circleCols = []
         for i in range(len(circleData)):
+            ringIndex = (i+1, i-len(circleData))
             ringCols = []
             ringVals = []
             for sample in samples:
@@ -419,19 +401,69 @@ def main(args):
             maxVal = max([0.01]+floatList(ringVals))
             for sample in samples:
                 if sample in circleData[i]:
-                    # redirect to multi-color code if we're on the outermost ring, if we're using the option
-                    if colorMap and i == (len(circleData)-1):
-                        ringCols.append(getColorFromColorMap(circleData[i][sample][feature], colorMap))
-                    elif feature in circleData[i][sample]:
-                        if type(circleColors[i]) is TupleType:
-                            ringCols.append(getColor(circleData[i][sample][feature], minVal, maxVal, minColor = circleColors[i][0], zeroColor = circleColors[i][1], maxColor = circleColors[i][2]))
+                    # first check if the feature is in the data
+                    if feature in circleData[i][sample]:
+                        # redirect to color map if it exists
+                        if colorMap:
+                            # check ring index
+                            if ringIndex[0] in colorMap or ringIndex[1] in colorMap:
+                                if ringIndex[0] in colorMap:
+                                    ringMap = colorMap[ringIndex[0]]
+                                else:
+                                    ringMap = colorMap[ringIndex[1]]
+                                # in the case of these keywords use standard function with alternate colors
+                                if "minColor" in ringMap or "zeroColor" in ringMap or "maxColor" in ringMap:
+                                    minColor = rgb(0, 0, 255)
+                                    zeroColor = rgb(255, 255, 255)
+                                    maxColor = rgb(255, 0, 0)
+                                    if "minColor" in ringMap:
+                                        minColor = rgb(ringMap["minColor"][0], ringMap["minColor"][1], ringMap["minColor"][2])
+                                    if "zeroColor" in ringMap:
+                                        zeroColor = rgb(ringMap["zeroColor"][0], ringMap["zeroColor"][1], ringMap["zeroColor"][2])
+                                    if "maxColor" in ringMap:
+                                        maxColor = rgb(ringMap["maxColor"][0], ringMap["maxColor"][1], ringMap["maxColor"][2])
+                                    ringCols.append(getColor(circleData[i][sample][feature], minVal, maxVal, minColor = minColor, zeroColor = zeroColor, maxColor = maxColor))
+                                # use direct color mapping
+                                else:
+                                    ringCols.append(getColorFromColorMap(circleData[i][sample][feature], ringMap))
+                            # default behavior
+                            else:
+                                ringCols.append(getColor(circleData[i][sample][feature], minVal, maxVal))
+                        # default behavior
                         else:
-                            ringCols.append(circleColors[i][circleData[i][sample][feature]].tohex())
+                            ringCols.append(getColor(circleData[i][sample][feature], minVal, maxVal))
+                    # redirect to wildcard ("*") if the feature isn't in the data
                     elif "*" in circleData[i][sample]:
-                        if type(circleColors[i]) is TupleType:
-                            ringCols.append(getColor(circleData[i][sample]["*"], minVal, maxVal, minColor = circleColors[i][0], zeroColor = circleColors[i][1], maxColor = circleColors[i][2]))
+                        # redirect to color map if it exists
+                        if colorMap:
+                            # check ring index
+                            if ringIndex[0] in colorMap or ringIndex[1] in colorMap:
+                                if ringIndex[0] in colorMap:
+                                    ringMap = colorMap[ringIndex[0]]
+                                else:
+                                    ringMap = colorMap[ringIndex[1]]
+                                # in the case of these keywords use standard function with alternate colors
+                                if "minColor" in ringMap or "zeroColor" in ringMap or "maxColor" in ringMap:
+                                    minColor = rgb(0, 0, 255)
+                                    zeroColor = rgb(255, 255, 255)
+                                    maxColor = rgb(255, 0, 0)
+                                    if "minColor" in ringMap:
+                                        minColor = rgb(ringMap["minColor"][0], ringMap["minColor"][1], ringMap["minColor"][2])
+                                    if "zeroColor" in ringMap:
+                                        zeroColor = rgb(ringMap["zeroColor"][0], ringMap["zeroColor"][1], ringMap["zeroColor"][2])
+                                    if "maxColor" in ringMap:
+                                        maxColor = rgb(ringMap["maxColor"][0], ringMap["maxColor"][1], ringMap["maxColor"][2])
+                                    ringCols.append(getColor(circleData[i][sample]["*"], minVal, maxVal, minColor = minColor, zeroColor = zeroColor, maxColor = maxColor))
+                                # use direct color mapping
+                                else:
+                                    ringCols.append(getColorFromColorMap(circleData[i][sample]["*"], ringMap))
+                            # default behavior
+                            else:
+                                ringCols.append(getColor(circleData[i][sample]["*"], minVal, maxVal))
+                        # default behavior
                         else:
-                            ringCols.append(circleColors[i][circleData[i][sample]["*"]].tohex())
+                            ringCols.append(getColor(circleData[i][sample]["*"], minVal, maxVal))
+                    # annotate as missing if the feature and wildcard isn't in the data
                     else:
                         ringCols.append(rgb(200, 200, 200).tohex())
                 else:
