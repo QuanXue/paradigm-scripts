@@ -138,7 +138,7 @@ def wrapParadigm():
         system("%s %s %s %s" % (sys.executable, xgmmlExec, options.xgmml, pathway))
     else:
         pathway = os.path.abspath(options.pathway)
-        shutil.copy(pathway, pathwayLib)
+        shutil.copy(pathway, os.path.join(pathwayLib, "pid_tmp_pathway.tab"))
 
 
     ## run
