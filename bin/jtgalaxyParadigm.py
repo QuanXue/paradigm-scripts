@@ -80,7 +80,7 @@ def wrapParadigm():
     parser.add_option("-n", "--nulls", dest="nulls", help="Number of Null Samples", default="5")
     parser.add_option("-d", "--dogma", dest="dogma", help="Path to PARADIGM Dogma Specification", default=basedogma)
     parser.add_option("-i", "--imap", dest="imap", help="Path to PARADIGM Interaction Map Specification", default=baseimap)
-    parser.add_option("-t", "--param", dest="param", help="Initial Parameter Starting Point", default=baseparams)
+    parser.add_option("-t", "--storedparam", dest="param", help="Initial Parameter Starting Point", default=baseparams)
     
     parser.add_option("--xgmml", dest="xgmml", help="Path to PARADIGM Pathway XGMML file", default=None)
     parser.add_option("-p", "--pathway", dest="pathway", help="Path to PARADIGM Pathway Specification", default=basepathway)
