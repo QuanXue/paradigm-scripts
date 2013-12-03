@@ -9,7 +9,7 @@ Options:
   -f str        list file containing features to include
   -o str        feature;file[,file ...] or feature
   -c str        file to use as center colors
-  -r str        color mapping file: tab-sep file defines the color mappings (1.0 255.0.0, 0.9 0.255.0...)
+  -r str        have the outer ring multi-colored: tab-sep file defines the color mappings (1.0 255.0.0, 0.9 0.255.0...)
   -l            print the feature identifier in the circle or not (default: FALSE)
   -q            run quietly
 """
@@ -335,7 +335,7 @@ def main(args):
         
         ## cohort png
         if len(orderFiles) > 0:
-            imgFile = "%s/Cohort.png" % (outputDir)
+            imgFile = "%s/Cohort.pdf" % (outputDir)
             label = "Cohort"
             centerCol = rgb(255, 255, 255).tohex()
             circleCols = []
@@ -375,7 +375,7 @@ def main(args):
         imgName = re.sub("[/:]", "_", feature)
         if len(imgName) > 100:
             imgName = imgName[:100]
-        imgFile = "%s/%s.png" % (outputDir, imgName)
+        imgFile = "%s/%s.pdf" % (outputDir, imgName)
         label = ""
         if printLabel:
             label = feature
