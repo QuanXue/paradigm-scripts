@@ -144,8 +144,10 @@ def wrapParadigm():
             print ("%d jobs failed" % failed)
         else:
             logger.info("Run complete!")
-            system("rm -rf .lastjobTree")
-            system("mv .jobTree .lastjobTree")
+            if os.path.exists(".lastjobTree"):
+                system("rm -rf .lastjobTree")
+            if os.path.exists(".jobTree"):
+                system("mv .jobTree .lastjobTree")
 
 if __name__ == "__main__":
     from wrapParadigm import *
