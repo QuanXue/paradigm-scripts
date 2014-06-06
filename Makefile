@@ -1,40 +1,36 @@
-THISDIR = $(CURDIR)
-THISOS = $(shell uname -s)
+THISDIR = ${CURDIR}
+THISOS = ${shell uname -s}
+
+JOBTREE_GIT = git://github.com/benedictpaten/jobTree.git
+JOBTREE_COMMIT = AAA
+SONLIB_GIT = git://github.com/benedictpaten/sonLib.git
+PATHMARK_GIT = git://github.com/ucscCancer/pathmark-scripts.git
+
+all : init.sh init.csh
 
 init.sh : jobTree exe
-	echo \
-	export PATH=$(THISDIR)/bin:$(THISDIR)/utilities:\$${PATH} > init.sh
-	echo \
-	if [ -n "\$${PYTHONPATH+x}" ] >> init.sh
-	echo \
-	then >> init.sh
-	echo \
-	  export PYTHONPATH=$(THISDIR):$(THISDIR)/bin:\$${PYTHONPATH} >> init.sh
-	echo \
-	else >> init.sh
-	echo \
-	  export PYTHONPATH=$(THISDIR):$(THISDIR)/bin >> init.sh
-	echo \
-	fi >> init.sh
-	echo \
-	setenv PATH $(THISDIR)/bin:$(THISDIR)/utilities:\$${PATH} > init.csh
-	echo \
-	if \$$?PYTHONPATH then >> init.csh
-	echo \
-	  setenv PYTHONPATH $(THISDIR):$(THISDIR)/bin:\$${PYTHONPATH} >> init.csh
-	echo \
-	else >> init.csh
-	echo \
-	  setenv PYTHONPATH $(THISDIR):$(THISDIR)/bin >> init.csh
-	echo \
-	endif >> init.csh
+	echo export PATH=${THISDIR}/bin:\$${PATH} > init.sh
+	echo if [ -n "\$${PYTHONPATH+x}" ] >> init.sh
+	echo then >> init.sh
+	echo export PYTHONPATH=${THISDIR}:${THISDIR}/bin:\$${PYTHONPATH} >> init.sh
+	echo else >> init.sh
+	echo export PYTHONPATH=${THISDIR}:${THISDIR}/bin >> init.sh
+	echo fi >> init.sh
+
+init.csh : jobTree exe
+	echo setenv PATH ${THISDIR}/bin:\$${PATH} > init.csh
+	echo if \$$?PYTHONPATH then >> init.csh
+	echo setenv PYTHONPATH ${THISDIR}:${THISDIR}/bin:\$${PYTHONPATH} >> init.csh
+	echo else >> init.csh
+	echo setenv PYTHONPATH ${THISDIR}:${THISDIR}/bin >> init.csh
+	echo endif >> init.csh
 
 jobTree : sonLib
-	git clone git://github.com/benedictpaten/jobTree.git
+	git clone ${JOBTREE_GIT}
 	cd jobTree; make
 
 sonLib :
-	git clone git://github.com/benedictpaten/sonLib.git
+	git clone ${SONLIB_GIT}
 
 exe :
 	mkdir exe
@@ -45,21 +41,22 @@ exe :
 	cd exe; cp /inside/grotto/users/sng/bin/Paradigm/paradigm /inside/grotto/users/sng/bin/Paradigm/collectParameters .; \
 	fi
 	if (! test -e exe/paradigm); then \
-	if [ $(THISOS) == Darwin ]; then \
+	if [ ${THISOS} == Darwin ]; then \
 	cd exe; cp ../public/exe/collectParameters ../public/exe/MACOSX/paradigm .; \
-	elif [ $(THISOS) == Linux ]; then \
+	elif [ ${THISOS} == Linux ]; then \
 	cd exe; cp ../public/exe/collectParameters ../public/exe/LINUX/paradigm .; \
 	else \
-	echo "paradigm not compiled for os $(THISOS)"; \
+	echo "paradigm not compiled for os ${THISOS}"; \
 	fi \
 	fi
-	ln -s $(THISDIR)/exe/paradigm bin/
-	ln -s $(THISDIR)/exe/collectParameters bin/
+	ln -s ${THISDIR}/exe/paradigm bin/
+	ln -s ${THISDIR}/exe/collectParameters bin/
 
 pathmark-scripts :
-	cd ..; git clone git://github.com/ucscCancer/pathmark-scripts.git
+	if [ ! -d '../pathmark-scripts' ]; then \
+		cd ..; git clone ${PATHMARK_GIT}; cd pathmark-scripts; make; \
+	fi
 	ln -s ../pathmark-scripts pathmark-scripts
-	cd pathmark-scripts; make
 
 galaxy : pathmark-scripts
 	mkdir -p paradigm_module
@@ -68,4 +65,4 @@ galaxy : pathmark-scripts
 
 clean :
 	rm -rf bin/paradigm bin/collectParameters pathmark-scripts jobTree sonLib exe init.sh init.csh
-	cd test; make clean
+	cd example; make clean
