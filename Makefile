@@ -2,7 +2,7 @@ THISDIR = ${CURDIR}
 THISOS = ${shell uname -s}
 
 JOBTREE_GIT = git://github.com/benedictpaten/jobTree.git
-JOBTREE_COMMIT = AAA
+JOBTREE_COMMIT = 649252f55d73c10c634e313a064b62b61af747c0
 SONLIB_GIT = git://github.com/benedictpaten/sonLib.git
 PATHMARK_GIT = git://github.com/ucscCancer/pathmark-scripts.git
 
@@ -27,7 +27,7 @@ init.csh : jobTree exe
 
 jobTree : sonLib
 	git clone ${JOBTREE_GIT}
-	cd jobTree; make
+	cd jobTree; git checkout 649252f55d73c10c634e313a064b62b61af747c0; make
 
 sonLib :
 	git clone ${SONLIB_GIT}
@@ -65,4 +65,6 @@ galaxy : pathmark-scripts
 
 clean :
 	rm -rf bin/paradigm bin/collectParameters pathmark-scripts jobTree sonLib exe init.sh init.csh
-	cd example; make clean
+	if [ -d 'example' ]; then \
+		cd example; make clean; \
+	fi
