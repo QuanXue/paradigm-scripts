@@ -43,7 +43,7 @@ Options:
 ## Written by: Charles Vaske
 ## Modified by: Sam Ng
 import os, sys, glob, getopt, re, subprocess, math, json
-from mParadigm import *
+import pandas
 
 ###
 ### Experiments to find the path of the currently executing script
@@ -200,9 +200,9 @@ def writeBaseParamsFile(pfilename, evidence, storedParams = {}):
                 mfile.close()
     pfile.close()
 
-def readPathwayTiming(directory):
+def readPathwayTiming(directory, pathways):
     if not os.path.exists(directory + "/timings.tab"):
-        return {}
+        return {pathway.split('/')[-1] : 900.0 for pathway in pathways}
     tfile = open(directory + "/timings.tab", "r")
     samplesline = tfile.readline().rstrip();
     m = re.search('^#\s*samples\s*(\d+)\s*', samplesline)
@@ -393,9 +393,9 @@ def prepareParadigm(args):
 
     log("Copying pathway files\n")
     syscmd("cp %s/*_pathway.tab %s" % (pathwayDir, dataDir))
-    timings = readPathwayTiming(pathwayDir)
     
     pathFiles = glob.glob(dataDir + "/*_pathway.tab")
+    timings = readPathwayTiming(pathwayDir, pathFiles)
 
     log("writing EM jobs list\n")
     jfile = open("jobsEM.list", "w")
@@ -510,10 +510,10 @@ def prepareParadigm(args):
                 if file.endswith(e["outputFile"].split("/")[-1]):
                     dataFiles.append(file)
         for file in dataFiles:
-            (dataMap, dataComments, dataFeatures, dataSamples) = rCRSData("%s/%s" % (dataDir, file), retFeatures = True)
+            data_frame = pandas.read_csv("%s/%s" % (dataDir, file), sep = '\t', index_col = 0)
             for b in range(len(dataSamples)):
                 bid = "b%i_%i_" % (b, len(dataSamples))
-                wCRSData("%s/%s" % (dataDir, bid + file), dataMap, useCols = list(set(dataFeatures) & set(pathFeatures)), useRows = [dataSamples[b]])
+                data_frame[list(set(dataFeatures) & set(pathFeatures))].loc[[dataSamples[b]]].to_csv("%s/%s" % (dataDir, bid + file), sep = '\t', na_rep = 'NA', index_label = 'samples')
 
 if __name__ == "__main__":
     prepareParadigm(sys.argv[1:])
