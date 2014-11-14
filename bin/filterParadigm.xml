@@ -1,6 +1,6 @@
 <tool id="filter_paradigm" name="Filter Paradigm" version="1.0.0">
-  <description>Filter Paradigm</description>
-  <command interpreter="python">filterParadigm.py 
+    <description>Filter Paradigm</description>
+    <command interpreter="python">filterParadigm.py 
 #if $filtered_all:
   --fa $file_filtered_all
 #end if
@@ -11,22 +11,22 @@
   --ur $file_unfiltered_real
 #end if
 $paradigm
-  </command>
-  <inputs>
-	  <param name="paradigm" type="data" label="Paradigm Output" optional="false"/>
-	  <param name="filtered_real" type="boolean" label="Output Filtered Real" checked="true"/>
-	  <param name="filtered_all" type="boolean" label="Output Filtered All" checked="false"/>
-	  <param name="unfiltered_real" type="boolean" label="Output UnFiltered Real" checked="false"/>
-  </inputs>
-  <outputs>
-      <data name="file_filtered_real" label="Filtered Real" format="tabular">
-		  <filter>filtered_real</filter>
-	  </data>
-      <data name="file_filtered_all" label="Filtered All" format="tabular">
-		   <filter>filtered_all</filter>
-	  </data>
-      <data name="file_unfiltered_real" label="Unfiltered Real" format="tabular">
-		   <filter>unfiltered_real</filter>
-	  </data>
-  </outputs>
+    </command>
+    <inputs>
+        <param name="paradigm" type="data" label="Paradigm Output" optional="false"/>
+        <param name="filtered_real" type="boolean" label="Output Filtered Real" checked="true"/>
+        <param name="filtered_all" type="boolean" label="Output Filtered All" checked="false"/>
+        <param name="unfiltered_real" type="boolean" label="Output UnFiltered Real" checked="false"/>
+    </inputs>
+    <outputs>
+        <data name="file_filtered_real" label="Filtered Real" format="tabular">
+            <filter>filtered_real</filter>
+        </data>
+        <data name="file_filtered_all" label="Filtered All" format="tabular">
+            <filter>filtered_all</filter>
+        </data>
+        <data name="file_unfiltered_real" label="Unfiltered Real" format="tabular">
+            <filter>unfiltered_real</filter>
+        </data>
+    </outputs>
 </tool>

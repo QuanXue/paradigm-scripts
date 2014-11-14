@@ -22,8 +22,8 @@ merge_exec = os.path.join(bin_dir, "merge_merged.py")
 filter_exec = os.path.join(bin_dir, "filterFeatures.py")
 
 ## defaults
-standard_dogma = os.path.join(bin_dir, "standard.dogma")
-standard_pathway = os.path.join(bin_dir, "pid_110725_pathway.tab")
+standard_dogma = os.path.join(bin_dir, "dogma_standard.zip")
+standard_pathway = os.path.join(bin_dir, "pathway_constitutive_v2.zip")
 standard_inference = "method=BP,updates=SEQFIX,tol=1e-9,maxiter=1,logdomain=0"
 
 ## gp functions
@@ -192,7 +192,7 @@ class Merge(Target):
 def gp_main():
     ## check for fresh run
     if os.path.exists(".jobTree"):
-        logging.earning("WARNING: '.jobTree' directory found, remove it first to start a fresh run\n")
+        logging.warning("WARNING: '.jobTree' directory found, remove it first to start a fresh run\n")
     
     ## parse arguments
     parser = OptionParser(usage = "%prog [options] attachment file:path [attachment file:path ...]")
@@ -238,7 +238,7 @@ def gp_main():
             evidence_list.append(args[i])
     
     if (len(evidence_list) % 2 == 1) | (len(evidence_list) == 0):
-        logging.info("ERROR: incorrect number of arguments\n")
+        logging.error("ERROR: incorrect number of arguments\n")
         sys.exit(1)
     
     work_dir = os.path.abspath(options.work_dir)
@@ -253,9 +253,27 @@ def gp_main():
     run_em = options.run_em
     
     ## import dogma and pathway libraries
-    ## handle dogma zip or directory and pathway zip, file, or directory
-    dogma_lib = os.path.abspath(options.dogma_lib)
-    pathway_lib = os.path.abspath(options.pathway_lib)
+    if options.dogma_lib.endswith('.zip'):
+        dogma_lib = os.path.join(work_dir, "dogma")
+        zf = zipfile.ZipFile(options.dogma_lib, 'r')
+        zf.extractall(dogma_lib)
+        zf.close()
+    elif os.path.isdir(options.dogma_lib):
+        dogma_lib = os.path.abspath(options.dogma_lib)
+    else:
+        logging.error("ERROR: dogma cannot be a regular file\n")
+        sys.exit(1)
+    if options.pathway_lib.endswith('.zip'):
+        pathway_lib = os.path.join(work_dir, "pathway")
+        zf = zipfile.ZipFile(options.pathway_lib, 'r')
+        zf.extractall(pathway_lib)
+        zf.close()
+    elif os.path.isdir(options.pathway_lib):
+        pathway_lib = os.path.abspath(options.pathway_lib)
+    else:
+        pathway_lib = os.path.join(work_dir, "pathway")
+        os.makedirs(pathway_lib)
+        shutil.copy(options.pathway_lib, pathway_lib)
     
     ## initialize the stack and run
     logging.info("starting prepare")

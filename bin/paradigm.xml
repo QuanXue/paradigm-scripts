@@ -1,11 +1,8 @@
 <tool id="paradigm" name="Paradigm" version="1.1.1">
-  <description>Paradigm</description>
-  <command interpreter="python">jtgalaxyParadigm.py -z
+    <description>Paradigm</description>
+    <command interpreter="python">galaxyParadigm.py
 #if str($dogma) != 'None':
   --dogma $dogma
-#end if
-#if str($imap) != 'None':
-  --imap $imap
 #end if
 #if str($pathway) != 'None':
   --pathway $pathway
@@ -18,9 +15,8 @@
 #end if
 --boundaries "$lower_boundary;$upper_boundary"
 #if str($storedparam) != 'None':
-  --storedparam $storedparam
+  --param $storedparam
 #end if
---lb-max $lb_max
 -w ./
 -o $file_output
 #if $output_params:
@@ -53,40 +49,38 @@
   meth file:$meth
 #end if 
 #end if 
-  </command>
-  <inputs>
-	  <param name="geneExp" type="data" format="tabular" label="Gene Exp Matrix" optional="true"/>
-    <param name="geneExp_pre" type="boolean" label="Pre-Adjusted Gene Expression Values"/>
-	  <param name="cnv" type="data" format="tabular" label="Copy Number Matrix" optional="true"/>
-    <param name="cnv_pre" type="boolean" label="Pre-Adjusted Copy Number Values"/>
-	  <param name="meth" type="data" format="tabular" label="Methylation Matrix" optional="true"/>
-    <param name="meth_pre" type="boolean" label="Pre-Adjusted Methylation Values"/>
-	  <param name="dogma" type="data" format="tabular" label="Dogma File" optional="true"/>
-    <param name="imap" type="data" format="tabular" label="Interaction Map File" optional="true"/>
-	  <param name="pathway" type="data" format="tabular" label="Pathway File" optional="true"/>
-	  <param name="lower_boundary" type="text" value="0.33" label="Lower Boundary Cutoffs"/>
-	  <param name="upper_boundary" type="text" value="0.67" label="Upper Boundary Cutoffs"/>
-	  <param name="nulls" type="integer" label="Null Count" optional="true"/>
-	  <param name="skip_em" type="boolean" label="Skip EM Cycle" checked="false"/>
-	  <param name="lb_max" type="integer" label="Loopy Belief Max Iteration" value="10000"/>
-	  <param name="storedparam" type="data" format="txt" label="Precomputer Parameter File" optional="True"/>
-	  <param name="output_params" type="boolean" label="Output Params" checked="false"/>
-	  <param name="output_config" type="boolean" label="Output Config" checked="false"/>
-	  <param name="output_files" type="boolean" label="Output Files" checked="false"/>      
-  </inputs>
-  <outputs>
-      <data name="file_output" format="tabular" label="Unfiltered All"/>
-      <data name="file_output_params" format="tabular" label="Params">
-		  <filter>output_params</filter>
-	  </data>
-      <data name="file_output_config" format="tabular" label="Config">
-		  <filter>output_config</filter>
-	  </data>
-      <data name="file_output_files" format="zip" label="Files">
-		  <filter>output_files</filter>
-	  </data>
-  </outputs>
-  <help>
+    </command>
+    <inputs>
+        <param name="geneExp" type="data" format="tabular" label="Gene Exp Matrix" optional="true"/>
+        <param name="geneExp_pre" type="boolean" label="Pre-Adjusted Gene Expression Values"/>
+        <param name="cnv" type="data" format="tabular" label="Copy Number Matrix" optional="true"/>
+        <param name="cnv_pre" type="boolean" label="Pre-Adjusted Copy Number Values"/>
+        <param name="meth" type="data" format="tabular" label="Methylation Matrix" optional="true"/>
+        <param name="meth_pre" type="boolean" label="Pre-Adjusted Methylation Values"/>
+        <param name="dogma" type="data" format="tabular" label="Dogma Zip" optional="true"/>
+        <param name="pathway" type="data" format="tabular" label="Pathway File/Zip" optional="true"/>
+        <param name="lower_boundary" type="text" value="0.33" label="Lower Boundary Cutoffs"/>
+        <param name="upper_boundary" type="text" value="0.67" label="Upper Boundary Cutoffs"/>
+        <param name="nulls" type="integer" label="Null Count" optional="true"/>
+        <param name="skip_em" type="boolean" label="Skip EM Cycle" checked="false"/>
+        <param name="storedparam" type="data" format="txt" label="Precomputer Parameter File" optional="True"/>
+        <param name="output_params" type="boolean" label="Output Params" checked="false"/>
+        <param name="output_config" type="boolean" label="Output Config" checked="false"/>
+        <param name="output_files" type="boolean" label="Output Files" checked="false"/>      
+    </inputs>
+    <outputs>
+        <data name="file_output" format="tabular" label="Unfiltered All"/>
+        <data name="file_output_params" format="tabular" label="Params">
+            <filter>output_params</filter>
+        </data>
+        <data name="file_output_config" format="tabular" label="Config">
+            <filter>output_config</filter>
+        </data>
+        <data name="file_output_files" format="zip" label="Files">
+            <filter>output_files</filter>
+        </data>
+    </outputs>
+    <help>
 Wrapper for Paradigm biological network inference program.  
-  </help>
+    </help>
 </tool>
