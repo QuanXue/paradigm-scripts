@@ -6,10 +6,10 @@ args = list(sys.argv)
 args.pop(0) # remove the script name
 
 if args[0] == "-n":
-	filterNA = True
-	args.pop(0)
+    filterNA = True
+    args.pop(0)
 else:
-	filterNA = False
+    filterNA = False
 
 filter = args[1]
 (count,cutoff) = filter.split(",")
@@ -24,23 +24,23 @@ headerA = header.split("\t")
 headerA.pop(0)
 
 for line in file:
-	lineA = line.strip("\n").split("\t")
-	lineA.pop(0)
-	currCount = 0
-	#for val in lineA:
-	for i in range(len(lineA)):
-		val = lineA[i]
-		if filterNA and headerA[i][:3] == "na_":
-			continue
-		try:
-			if abs(float(val)) >= cutoff:
-				currCount += 1
-		except ValueError:
-			pass
-		if currCount >= count:
-			sys.stdout.write(line)
-			sys.stdout.flush()
-			break
+    lineA = line.strip("\n").split("\t")
+    lineA.pop(0)
+    currCount = 0
+    #for val in lineA:
+    for i in range(len(lineA)):
+        val = lineA[i]
+        if filterNA and headerA[i][:3] == "na_":
+            continue
+        try:
+            if abs(float(val)) >= cutoff:
+                currCount += 1
+        except ValueError:
+            pass
+        if currCount >= count:
+            sys.stdout.write(line)
+            sys.stdout.flush()
+            break
 file.close()
 
 

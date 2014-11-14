@@ -6,20 +6,20 @@ import sys
 
 
 class SimpleGraph:
-	def __init__(self):
-		self.node = {}
-		self.edge = {}
+    def __init__(self):
+        self.node = {}
+        self.edge = {}
 
-	def add_node(self, node):
-		self.node[node] = {}
-		self.edge[node] = {}
+    def add_node(self, node):
+        self.node[node] = {}
+        self.edge[node] = {}
 
-	def add_edge(self, src, target):
-		if target not in self.node:
-			self.add_node(target)
-		if target not in self.edge[src]:
-			self.edge[src][target] = {}
-		self.edge[src][target][len(self.edge[src][target])] = {}
+    def add_edge(self, src, target):
+        if target not in self.node:
+            self.add_node(target)
+        if target not in self.edge[src]:
+            self.edge[src][target] = {}
+        self.edge[src][target][len(self.edge[src][target])] = {}
 
 
 
@@ -128,16 +128,16 @@ def write_paradigm_graph(gr, handle, node_type_field='type', node_type_default='
 
 
 def main(src, dst):
-	ihandle = open(src)
-	gr = read_xgmml(ihandle)
-	ihandle.close()
+    ihandle = open(src)
+    gr = read_xgmml(ihandle)
+    ihandle.close()
 
-	ohandle = open(dst, "w")
-	write_paradigm_graph(gr, ohandle)
-	ohandle.close()
+    ohandle = open(dst, "w")
+    write_paradigm_graph(gr, ohandle)
+    ohandle.close()
 
 if __name__ == "__main__":
-	main(sys.argv[1], sys.argv[2])
+    main(sys.argv[1], sys.argv[2])
 
 
 

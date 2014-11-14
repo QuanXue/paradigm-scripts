@@ -8,7 +8,7 @@ PATHMARK_GIT = git://github.com/ucscCancer/pathmark-scripts.git
 
 all : init.sh init.csh
 
-init.sh : jobTree exe
+init.sh : jobTree bin/paradigm
 	echo export PATH=${THISDIR}/bin:\$${PATH} > init.sh
 	echo if [ -n "\$${PYTHONPATH+x}" ] >> init.sh
 	echo then >> init.sh
@@ -17,7 +17,7 @@ init.sh : jobTree exe
 	echo export PYTHONPATH=${THISDIR}:${THISDIR}/bin >> init.sh
 	echo fi >> init.sh
 
-init.csh : jobTree exe
+init.csh : jobTree bin/paradigm
 	echo setenv PATH ${THISDIR}/bin:\$${PATH} > init.csh
 	echo if \$$?PYTHONPATH then >> init.csh
 	echo setenv PYTHONPATH ${THISDIR}:${THISDIR}/bin:\$${PYTHONPATH} >> init.csh
@@ -32,22 +32,19 @@ jobTree : sonLib
 sonLib :
 	git clone ${SONLIB_GIT}
 
-exe :
-	mkdir exe
+bin/paradigm :
 	if (test -d /inside); then \
-	cd exe; cp /inside/grotto/users/sng/bin/Paradigm/paradigm /inside/grotto/users/sng/bin/Paradigm/collectParameters .; \
+	cd bin; cp /inside/grotto/users/sng/bin/Paradigm/paradigm /inside/grotto/users/sng/bin/Paradigm/collectParameters .; \
 	fi
-	if (! test -e exe/paradigm); then \
+	if (! test -e bin/paradigm); then \
 	if [ ${THISOS} == Darwin ]; then \
-	cd exe; cp ../public/exe/collectParameters ../public/exe/MACOSX/paradigm .; \
+	cd bin; cp ../exe/public/collectParameters ../exe/public/MACOSX/paradigm .; \
 	elif [ ${THISOS} == Linux ]; then \
-	cd exe; cp ../public/exe/collectParameters ../public/exe/LINUX/paradigm .; \
+	cd bin; cp ../exe/public/collectParameters ../exe/public/LINUX/paradigm .; \
 	else \
 	echo "paradigm not compiled for ${THISOS}"; \
 	fi \
 	fi
-	ln -s ${THISDIR}/exe/paradigm bin/
-	ln -s ${THISDIR}/exe/collectParameters bin/
 
 pathmark-scripts :
 	if [ ! -d '../pathmark-scripts' ]; then \
@@ -55,13 +52,8 @@ pathmark-scripts :
 	fi
 	ln -s ../pathmark-scripts pathmark-scripts
 
-galaxy : pathmark-scripts
-	mkdir -p paradigm_module
-	cp bin/* paradigm_module/
-	cp -r pathmark-scripts/bin/* paradigm_module/
-
 clean :
-	rm -rf bin/paradigm bin/collectParameters pathmark-scripts jobTree sonLib exe init.sh init.csh
+	rm -rf bin/paradigm bin/collectParameters pathmark-scripts jobTree sonLib init.sh init.csh
 	if [ -d 'example' ]; then \
 		cd example; make clean; \
 	fi

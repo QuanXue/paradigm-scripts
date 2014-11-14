@@ -38,10 +38,11 @@ Options:
    -c options           options to pass to createNullFiles.py (quote them all)
    -b flt;flt[,flt;flt] boundaries for discretization, use comma to specify different
                         boundaries per evidence (default 0.333;0.667)
+   -y                   using the public version of paradigm
    -q                   run quietly, don't output status
 """
 ## Written by: Charles Vaske
-## Modified by: Sam Ng
+## Modifications by: Sam Ng
 import os, sys, glob, getopt, re, subprocess, math, json
 import pandas
 
@@ -57,6 +58,8 @@ scriptDirectory = os.path.realpath(os.path.dirname(sys.argv[0]))
 evidenceTypes = {
     "file":  (("cat %%s" +
                " | %s %s/quantileTransform.py /dev/stdin") % (sys.executable, scriptDirectory)),
+    "rankAllFile":  (("cat %%s" +
+               " | %s %s/quantileTransform.py /dev/stdin") % (sys.executable, scriptDirectory)),
     "rawFile":  "cat %s",
     "rawTrans": "%s %s/transpose.py -f %%s -" % (sys.executable, scriptDirectory)
     }
@@ -66,7 +69,7 @@ dataDir = "clusterFiles"
 #outputDir = "outputFiles"
 
 verbose = True
-publicParadigm = True
+publicParadigm = False
 publicBatchFix = False
 standardAttach = ["genome", "mRNA", "protein", "active"]
 paradigmExec = os.path.join(os.path.abspath(os.path.dirname(__file__)), "paradigm")
@@ -284,7 +287,7 @@ def mkdir(dirname):
 def prepareParadigm(args):
     pathwayDir = None
     try:
-        opts, args = getopt.getopt(args, "p:n:e:qc:b:s:t:i:d:z")
+        opts, args = getopt.getopt(args, "p:n:e:qc:b:s:t:i:d:y")
     except getopt.GetoptError, err:
         print str(err)
         usage(2)
@@ -300,8 +303,8 @@ def prepareParadigm(args):
     for o, a in opts:
         if o == "-p":
             pathwayDir = a
-        elif o == "-z":
-            publicParadigm = False
+        elif o == "-y":
+            publicParadigm = True
         elif o == "-d":
             dogmaDir = a
             fn = os.path.join(dogmaDir, "configTop")
