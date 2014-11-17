@@ -8,14 +8,14 @@ import math, os, sys, re
 import numpy as np
 import pandas
 from matplotlib import *
-use('Agg')
+use("Agg")
 from pylab import *
 
 from optparse import OptionParser
 
-color_parameters = ['min_color', 'zero_color', 'max_color', 'min_value', 'max_value', 'boundary_method']
+color_parameters = ["min_color", "zero_color", "max_color", "min_value", "max_value", "boundary_method"]
 tstep = 0.01
-image_format = 'png'
+image_format = "png"
 
 class RGB:
     """
@@ -39,8 +39,8 @@ class RGB:
         elif self.b < 0:
             self.b = 0
     def hex(self):
-        hex_characters = '0123456789ABCDEF'
-        return('#' + hex_characters[self.r / 16] + hex_characters[self.r % 16]
+        hex_characters = "0123456789ABCDEF"
+        return("#" + hex_characters[self.r / 16] + hex_characters[self.r % 16]
                    + hex_characters[self.g / 16] + hex_characters[self.g % 16]
                    + hex_characters[self.b / 16] + hex_characters[self.b % 16])
 
@@ -51,7 +51,7 @@ def logger(message, log_file = None, die = False):
     if log_file is None:
         sys.stderr.write(message)
     else:
-        o = open(log_file, 'a')
+        o = open(log_file, "a")
         o.write(message)
         o.close()
     if die:
@@ -62,7 +62,7 @@ def readList(input_file):
     Reads a simple one column list [2014-11-7]
     """
     input_list = []
-    f = open(input_file, 'r')
+    f = open(input_file, "r")
     input_list = [line.rstrip() for line in f]
     f.close()
     return(input_list)
@@ -75,19 +75,19 @@ def parseColorMap(input_file):
     ## max_color, min_value, max_value, and boundary_method *or* direct mappings from value to color
     color_map = {}
     ring_index = None
-    f = open(input_file, 'r')
+    f = open(input_file, "r")
     for line in f:
         ## set the ring index, an index of 0 refers to the center circle, 1 is the first
         ## ring, and -1 is the last ring
-        if line.startswith('>'):
-            ring_index = int(line.lstrip('>'))
+        if line.startswith(">"):
+            ring_index = int(line.lstrip(">"))
         ## assign attributes to rings
         else:
             if ring_index is None:
                 raise Exception("unspecified ring for attribute")
             if ring_index not in color_map:
                 color_map[ring_index] = {}
-            parts = line.rstrip().split('\t')
+            parts = line.rstrip().split("\t")
             color_map[ring_index][parts[0]] = parts[1]
     f.close()
     return(color_map)
@@ -109,8 +109,8 @@ def scmp(a, b, feature, ring_list):
     ## handle cases in which the feature is not in the sorting dataset, use * if possible
     ring_feature = feature
     if ring_feature not in ring_list[0].index:
-        if '*' in ring_list[0].index:
-            ring_feature = '*'
+        if "*" in ring_list[0].index:
+            ring_feature = "*"
         else:
             if len(ring_list) == 1:
                 return(0)
@@ -133,7 +133,7 @@ def getColorFromMap(key, color_map):
     if key not in color_map:
         raise Exception("key not assigned in color map")
     try:
-        (r, g, b) = color_map[key].split('.')
+        (r, g, b) = color_map[key].split(".")
     except KeyError:
         raise Exception("key not assigned in color map")
     except ValueError:
@@ -180,15 +180,15 @@ def polar(r, value):
     y = r * math.sin(theta)
     return(x, y)
 
-def plotCircle(image_file, image_label = '', center_color = RGB(255, 255, 255).hex(), ring_colors = [[RGB(200, 200, 200).hex()]], border_color = RGB(0, 0, 0).hex(), inner_radius_total = 0.2, outer_radius_total = 0.5, width = 5):
+def plotCircle(image_file, image_label = "", center_color = RGB(255, 255, 255).hex(), ring_colors = [[RGB(200, 200, 200).hex()]], border_color = RGB(0, 0, 0).hex(), inner_radius_total = 0.2, outer_radius_total = 0.5, width = 5):
     """
     Generates the circle image by building each ring from a list of colors [CirclePlot specific]
     """
     ## set image settings
     image_size = (width, width)
-    fig = plt.figure(figsize = image_size, dpi = 100, frameon = True, facecolor = 'w')
-    axes([0, 0, 1, 1], frameon = True, axisbg = 'w')
-    axis('off')
+    fig = plt.figure(figsize = image_size, dpi = 100, frameon = True, facecolor = "w")
+    axes([0, 0, 1, 1], frameon = True, axisbg = "w")
+    axis("off")
     ring_width = (outer_radius_total - inner_radius_total) / float(len(ring_colors))
     
     ## color center
@@ -302,7 +302,7 @@ def plotCircle(image_file, image_label = '', center_color = RGB(255, 255, 255).h
             fill(x_list, y_list, border_color, lw = 1, ec = border_color)
 
     ## save image
-    text(0, 0, image_label, ha = 'center', va = 'center')
+    text(0, 0, image_label, ha = "center", va = "center")
     xlim(-0.5, 0.5)
     ylim(-0.5, 0.5)
     savefig(image_file)
@@ -310,14 +310,21 @@ def plotCircle(image_file, image_label = '', center_color = RGB(255, 255, 255).h
 
 def main(args):
     ## parse arguments
-    parser = OptionParser(usage = '%prog [options] output_directory input_matrix [input_matrix ...]')
-    parser.add_option('-s', '--samples', dest='sample_file', default=None)
-    parser.add_option('-f', '--features', dest='feature_file', default=None)
-    parser.add_option('-o', '--order', dest='order_parameters', default=None)
-    parser.add_option('-c', '--center', dest='center_file', default=None)
-    parser.add_option('-m', '--mapping', dest='color_map_file', default=None)
-    parser.add_option('-e', '--extension', dest='file_extension', default='png')
-    parser.add_option('-l', '--label', dest='print_label', action='store_true', default=False)
+    parser = OptionParser(usage = "%prog [options] output_directory input_matrix [input_matrix ...]")
+    parser.add_option("-s", "--samples", dest = "sample_file", default = None,
+                      help = "")
+    parser.add_option("-f", "--features", dest = "feature_file", default = None,
+                      help = "")
+    parser.add_option("-o", "--order", dest = "order_parameters", default = None,
+                      help = "")
+    parser.add_option("-c", "--center", dest = "center_file", default = None,
+                      help = "")
+    parser.add_option("-m", "--mapping", dest = "color_map_file", default = None,
+                      help = "")
+    parser.add_option("-e", "--extension", dest = "file_extension", default = "png",
+                      help = "")
+    parser.add_option("-l", "--label", dest = "print_label", action = "store_true", default = False,
+                      help = "")
     options, args = parser.parse_args()
     
     assert(len(args) >= 2)
@@ -328,13 +335,13 @@ def main(args):
     sample_file = options.sample_file
     feature_file = options.feature_file
     if options.order_parameters is not None:
-        parts = options.order_parameters.split(';')
+        parts = options.order_parameters.split(";")
         if len(parts) == 1:
             order_feature = parts[0]
             order_files = []
         else:
             order_feature = parts[0]
-            order_files = parts[1].split(',')
+            order_files = parts[1].split(",")
     else:
         order_feature = None
         order_files = []
@@ -357,18 +364,18 @@ def main(args):
     ## read center file
     center_data = None
     if center_file is not None:
-        center_data = pandas.read_csv(center_file, sep = '\t', index_col = 0).icol(0)
+        center_data = pandas.read_csv(center_file, sep = "\t", index_col = 0).icol(0)
     
     ## read circle files
     ring_data = []
     for index in range(len(ring_files)):
-        data = pandas.read_csv(ring_files[index], sep = '\t', index_col = 0)
+        data = pandas.read_csv(ring_files[index], sep = "\t", index_col = 0)
         if sample_file is not None:
             data = data[sorted(list(set(data.columns) & set(samples)))]
         else:
             samples = list(set(data.columns) | set(samples))
         if feature_file is not None:
-            data = data.loc[sorted(list(set(data.index) & set(features + ['*'])))]
+            data = data.loc[sorted(list(set(data.index) & set(features + ["*"])))]
         else:
             features = list(set(data.index) | set(features))
         ring_data.append(data)
@@ -378,11 +385,11 @@ def main(args):
         if len(order_files) > 0:
             order_data = []
             for index in range(len(order_files)):
-                data = pandas.read_csv(order_files[index], sep = '\t', index_col = 0)
+                data = pandas.read_csv(order_files[index], sep = "\t", index_col = 0)
                 if sample_file is not None:
                     data = data[sorted(list(set(data.columns) & set(samples)))]
                 if feature_file is not None:
-                    data = data.loc[sorted(list(set(data.index) & set(features + ['*'])))]
+                    data = data.loc[sorted(list(set(data.index) & set(features + ["*"])))]
                 order_data.append(data)
         else:
             order_data = ring_data
@@ -394,23 +401,23 @@ def main(args):
         if ring_index not in color_map:
             color_map[ring_index] = {}
         if len(filter(lambda x: x not in color_parameters, color_map[ring_index].keys())) == 0:
-            if 'min_value' not in color_map[ring_index] or 'max_value' not in color_map[ring_index]:
-                if 'boundary_method' not in color_map[ring_index]:
-                    color_map[ring_index]['boundary_method'] = 'global'
-                if color_map[ring_index]['boundary_method'] == 'global':
+            if "min_value" not in color_map[ring_index] or "max_value" not in color_map[ring_index]:
+                if "boundary_method" not in color_map[ring_index]:
+                    color_map[ring_index]["boundary_method"] = "global"
+                if color_map[ring_index]["boundary_method"] == "global":
                     ring_values = center_data.values
-                    ring_values = list(ring_values[ring_values != 'nan'])
-                    if 'min_value' not in color_map[ring_index]:
-                        color_map[ring_index]['min_value'] = min([0.0] + ring_values)
-                    if 'max_value' not in color_map[ring_index]:
-                        color_map[ring_index]['max_value'] = max([0.0] + ring_values)
-                elif color_map[ring_index]['boundary_method'] == 'selected':
+                    ring_values = list(ring_values[ring_values != "nan"])
+                    if "min_value" not in color_map[ring_index]:
+                        color_map[ring_index]["min_value"] = min([0.0] + ring_values)
+                    if "max_value" not in color_map[ring_index]:
+                        color_map[ring_index]["max_value"] = max([0.0] + ring_values)
+                elif color_map[ring_index]["boundary_method"] == "selected":
                     ring_values = center_data[features].values
-                    ring_values = list(ring_values[ring_values != 'nan'])
-                    if 'min_value' not in color_map[ring_index]:
-                        color_map[ring_index]['min_value'] = min([0.0] + ring_values)
-                    if 'max_value' not in color_map[ring_index]:
-                        color_map[ring_index]['max_value'] = max([0.0] + ring_values)
+                    ring_values = list(ring_values[ring_values != "nan"])
+                    if "min_value" not in color_map[ring_index]:
+                        color_map[ring_index]["min_value"] = min([0.0] + ring_values)
+                    if "max_value" not in color_map[ring_index]:
+                        color_map[ring_index]["max_value"] = max([0.0] + ring_values)
                 else:
                     raise Exception("boundary method for center is not valid")
     for index in range(len(ring_data)):
@@ -420,31 +427,31 @@ def main(args):
             ring_index = index + 1
             color_map[ring_index] = {}
         if len(filter(lambda x: x not in color_parameters, color_map[ring_index].keys())) == 0:
-            if 'min_value' not in color_map[ring_index] or 'max_value' not in color_map[ring_index]:
-                if 'boundary_method' not in color_map[ring_index]:
-                    color_map[ring_index]['boundary_method'] = 'single'
-                if color_map[ring_index]['boundary_method'] == 'global':
+            if "min_value" not in color_map[ring_index] or "max_value" not in color_map[ring_index]:
+                if "boundary_method" not in color_map[ring_index]:
+                    color_map[ring_index]["boundary_method"] = "single"
+                if color_map[ring_index]["boundary_method"] == "global":
                     ring_values = np.asarray([value for row in ring_data[index].values for value in row])
-                    ring_values = list(ring_values[ring_values != 'nan'])
-                    if 'min_value' not in color_map[ring_index]:
-                        color_map[ring_index]['min_value'] = min([0.0] + ring_values)
-                    if 'max_value' not in color_map[ring_index]:
-                        color_map[ring_index]['max_value'] = max([0.0] + ring_values)
-                elif color_map[ring_index]['boundary_method'] == 'selected':
+                    ring_values = list(ring_values[ring_values != "nan"])
+                    if "min_value" not in color_map[ring_index]:
+                        color_map[ring_index]["min_value"] = min([0.0] + ring_values)
+                    if "max_value" not in color_map[ring_index]:
+                        color_map[ring_index]["max_value"] = max([0.0] + ring_values)
+                elif color_map[ring_index]["boundary_method"] == "selected":
                     ring_values = np.asarray([value for row in ring_data[index].loc[features].values for value in row])
-                    ring_values = list(ring_values[ring_values != 'nan'])
-                    if 'min_value' not in color_map[ring_index]:
-                        color_map[ring_index]['min_value'] = min([0.0] + ring_values)
-                    if 'max_value' not in color_map[ring_index]:
-                        color_map[ring_index]['max_value'] = max([0.0] + ring_values)
-                elif color_map[ring_index]['boundary_method'] == 'single':
-                    color_map[ring_index]['min_value'] = {}
-                    color_map[ring_index]['max_value'] = {}
+                    ring_values = list(ring_values[ring_values != "nan"])
+                    if "min_value" not in color_map[ring_index]:
+                        color_map[ring_index]["min_value"] = min([0.0] + ring_values)
+                    if "max_value" not in color_map[ring_index]:
+                        color_map[ring_index]["max_value"] = max([0.0] + ring_values)
+                elif color_map[ring_index]["boundary_method"] == "single":
+                    color_map[ring_index]["min_value"] = {}
+                    color_map[ring_index]["max_value"] = {}
                     for feature in features:
                         ring_values = np.asarray([value for row in ring_data[index].loc[[feature]].values for value in row])
-                        ring_values = list(ring_values[ring_values != 'nan'])
-                        color_map[ring_index]['min_value'][feature] = min([0.0] + ring_values)
-                        color_map[ring_index]['max_value'][feature] = max([0.0] + ring_values)
+                        ring_values = list(ring_values[ring_values != "nan"])
+                        color_map[ring_index]["min_value"][feature] = min([0.0] + ring_values)
+                        color_map[ring_index]["max_value"][feature] = max([0.0] + ring_values)
                 else:
                     raise Exception("boundary method for ring is not valid")
     
@@ -452,20 +459,20 @@ def main(args):
     for feature in features:
         ## set name and label
         logger("Drawing %s\n" % (feature))
-        image_name = re.sub('[/:]', '_', feature)
+        image_name = re.sub("[/:]", "_", feature)
         if len(image_name) > 100:
             image_name = image_name[:100]
         image_file = "%s/%s.%s" % (output_directory, image_name, image_format)
-        image_label = ''
+        image_label = ""
         if print_label:
             image_label = feature
         ## set center color
         if center_data is not None:
             ring_index = 0
             if feature in center_data:
-                if 'min_value' in color_map[ring_index] and 'max_value' in color_map[ring_index]:
-                    min_value = color_map[ring_index]['min_value']
-                    max_value = color_map[ring_index]['max_value']
+                if "min_value" in color_map[ring_index] and "max_value" in color_map[ring_index]:
+                    min_value = color_map[ring_index]["min_value"]
+                    max_value = color_map[ring_index]["max_value"]
                     center_color = getColorFromValue(center_data[feature], min_value, max_value)
                 else:
                     center_color = getColorFromMap(center_data[feature], color_map[ring_index])
@@ -479,29 +486,29 @@ def main(args):
             current_ring = []
             if feature in ring_data[index].index:
                 ring_feature = feature
-            elif '*' in ring_data[index].index:
-                ring_feature = '*'
+            elif "*" in ring_data[index].index:
+                ring_feature = "*"
             else:
                 ring_feature = None
             ring_index = filter(lambda x: x in color_map.keys(), [index + 1, index - len(ring_data)])[0]
             ## first check if this ring is to be skipped
-            if 'skip_ring' in color_map[ring_index]:
+            if "skip_ring" in color_map[ring_index]:
                 ring_colors.append(current_ring)
                 continue
             for sample in samples:
                 try:
-                    if 'min_value' in color_map[ring_index] and 'max_value' in color_map[ring_index]:
-                        min_value = color_map[ring_index]['min_value']
-                        max_value = color_map[ring_index]['max_value']
+                    if "min_value" in color_map[ring_index] and "max_value" in color_map[ring_index]:
+                        min_value = color_map[ring_index]["min_value"]
+                        max_value = color_map[ring_index]["max_value"]
                         min_color = RGB(0, 0, 255)
                         zero_color = RGB(255, 255, 255)
                         max_color = RGB(255, 0, 0)
-                        if 'min_color' in color_map[ring_index]:
-                            min_color = RGB(color_map[ring_index]['min_color'][0], color_map[ring_index]['min_color'][1], color_map[ring_index]['min_color'][2])
-                        if 'zero_color' in color_map[ring_index]:
-                            zero_color = RGB(color_map[ring_index]['zero_color'][0], color_map[ring_index]['zero_color'][1], color_map[ring_index]['zero_color'][2])
-                        if 'max_color' in color_map[ring_index]:
-                            max_color = RGB(color_map[ring_index]['max_color'][0], color_map[ring_index]['max_color'][1], color_map[ring_index]['max_color'][2])
+                        if "min_color" in color_map[ring_index]:
+                            min_color = RGB(color_map[ring_index]["min_color"][0], color_map[ring_index]["min_color"][1], color_map[ring_index]["min_color"][2])
+                        if "zero_color" in color_map[ring_index]:
+                            zero_color = RGB(color_map[ring_index]["zero_color"][0], color_map[ring_index]["zero_color"][1], color_map[ring_index]["zero_color"][2])
+                        if "max_color" in color_map[ring_index]:
+                            max_color = RGB(color_map[ring_index]["max_color"][0], color_map[ring_index]["max_color"][1], color_map[ring_index]["max_color"][2])
                         current_ring.append(getColorFromValue(ring_data[index][sample].loc[ring_feature], min_value, max_value, min_color = min_color, zero_color = zero_color, max_color = max_color))
                     else:
                         current_ring.append(getColorFromMap(ring_data[index][sample].loc[ring_feature], color_map[ring_index]))

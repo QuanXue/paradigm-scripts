@@ -7,7 +7,7 @@ import logging, os, re, sys
 from optparse import OptionParser
 
 ## logger
-logging.basicConfig(filename="filter.log", level=logging.INFO)
+logging.basicConfig(filename="filter-paradigm.log", level=logging.INFO)
 
 ## executables
 bin_dir = os.path.dirname(os.path.abspath(__file__))
@@ -28,13 +28,12 @@ def main():
                       help="Filter Count")
     parser.add_option("-m", "--min", dest="min", type=float, default=0.5,
                       help="Min IPL Value")
-    
     options, args = parser.parse_args()
     
-    input_file = os.path.abspath(args[0]) 
     if len(args) != 1:
         logging.error("ERROR: incorrect number of arguments\n")
         sys.exit(1)
+    input_file = os.path.abspath(args[0]) 
     
     select = {}
     f = open(input_file, "r")

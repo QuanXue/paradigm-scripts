@@ -10,7 +10,7 @@ from jobTree.scriptTree.target import Target
 from jobTree.scriptTree.stack import Stack
 
 ## logger
-logging.basicConfig(filename="paradigm.log", level=logging.INFO)
+logging.basicConfig(filename="galaxy-paradigm.log", level=logging.INFO)
 
 ## executabes
 bin_dir = os.path.dirname(os.path.abspath(__file__))
@@ -64,7 +64,7 @@ class PrepareParadigm(Target):
     def run(self):
         os.chdir(self.directory)
         
-        if os.path.exists('clusterFiles/'):
+        if os.path.exists("clusterFiles/"):
             assert os.path.exists("jobs.list")
             assert os.path.exists("jobsEM.list")
             assert os.path.exists("config.txt")
@@ -253,9 +253,9 @@ def gp_main():
     run_em = options.run_em
     
     ## import dogma and pathway libraries
-    if options.dogma_lib.endswith('.zip'):
+    if options.dogma_lib.endswith(".zip"):
         dogma_lib = os.path.join(work_dir, "dogma")
-        zf = zipfile.ZipFile(options.dogma_lib, 'r')
+        zf = zipfile.ZipFile(options.dogma_lib, "r")
         zf.extractall(dogma_lib)
         zf.close()
     elif os.path.isdir(options.dogma_lib):
@@ -263,9 +263,9 @@ def gp_main():
     else:
         logging.error("ERROR: dogma cannot be a regular file\n")
         sys.exit(1)
-    if options.pathway_lib.endswith('.zip'):
+    if options.pathway_lib.endswith(".zip"):
         pathway_lib = os.path.join(work_dir, "pathway")
-        zf = zipfile.ZipFile(options.pathway_lib, 'r')
+        zf = zipfile.ZipFile(options.pathway_lib, "r")
         zf.extractall(pathway_lib)
         zf.close()
     elif os.path.isdir(options.pathway_lib):
@@ -296,7 +296,7 @@ def gp_main():
         
         failed = s.startJobTree(options)
         if failed:
-            print ("%d jobs failed" % failed)
+            logging.warning("WARNING: %d jobs failed" % (failed))
         else:
             shutil.copy(os.path.join(options.work_dir, "merge_merged_unfiltered.all.tab"), options.output_ipls)
             if options.output_params is not None:
