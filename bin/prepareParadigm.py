@@ -502,11 +502,6 @@ def prepareParadigm(args):
     
     if publicBatchFix:
         log("Batching data for Paradigm\n")
-        pathFeatures = []
-        for file in os.listdir(dataDir):
-            if file.endswith("_pathway.tab"):
-                (pathNodes, pathInteractions) = rPathway("%s/%s" % (dataDir, file))
-                pathFeatures = list(set(pathNodes) | set(pathFeatures))
         dataFiles = []
         for file in os.listdir(dataDir):
             for e in evidence:
@@ -514,9 +509,13 @@ def prepareParadigm(args):
                     dataFiles.append(file)
         for file in dataFiles:
             data_frame = pandas.read_csv("%s/%s" % (dataDir, file), sep = '\t', index_col = 0)
+            dataFeatures = list(data_frame.columns)
+            dataFeatures.sort()
+            dataSamples = list(data_frame.index)
+            dataSamples.sort()
             for b in range(len(dataSamples)):
                 bid = "b%i_%i_" % (b, len(dataSamples))
-                data_frame[list(set(dataFeatures) & set(pathFeatures))].loc[[dataSamples[b]]].to_csv("%s/%s" % (dataDir, bid + file), sep = '\t', na_rep = 'NA', index_label = 'samples')
+                data_frame[dataFeatures].loc[[dataSamples[b]]].to_csv("%s/%s" % (dataDir, bid + file), sep = '\t', na_rep = 'NA', index_label = 'id')
 
 if __name__ == "__main__":
     prepareParadigm(sys.argv[1:])

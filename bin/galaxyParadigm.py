@@ -26,7 +26,7 @@ standard_dogma = os.path.join(bin_dir, "dogma_standard.zip")
 standard_pathway = os.path.join(bin_dir, "pathway_constitutive_v2.zip")
 standard_inference = "method=BP,updates=SEQFIX,tol=1e-9,maxiter=10000,logdomain=0"
 
-## functions
+## gp functions
 def commandAvailable(executable):
     return(os.system("which %s > /dev/null 2> /dev/null" % executable) == 0)
 
