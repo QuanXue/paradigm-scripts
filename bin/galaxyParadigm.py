@@ -88,9 +88,9 @@ class PrepareParadigm(Target):
                                                                    self.pathway_lib,
                                                                    self.evidence_spec)
             l = open("prepare.log", "w")
-            l.write(cmd)
+            l.write("# " + cmd + "\n")
             l.close()
-            os.system(cmd)
+            os.system(cmd + " >> prepare.log")
         if self.run_em:
             self.setFollowOnTarget(ExpectationIteration(0, 0.001, self.directory))
         else:
