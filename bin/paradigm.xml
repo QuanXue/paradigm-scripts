@@ -20,6 +20,7 @@
 -w ./
 #if $output_params_flag:
   -y
+#end if
 -o $output_file
 #if $output_params_flag:
   --op $output_params
