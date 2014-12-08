@@ -18,21 +18,21 @@
   --param $storedparam
 #end if
 -w ./
--o $file_output
-#if $output_params:
-  --op $file_output_params
+-o $output_file
+#if $output_params_flag:
+  --op $output_params
 #end if
-#if $output_config:
-  --oc $file_output_config
+#if $output_config_flag:
+  --oc $output_config
 #end if
-#if $output_files:
-  --of $file_output_files
+#if $output_zip_flag:
+  --of $output_zip
 #end if
-#if str($geneExp) != 'None':
-#if $geneExp_pre:
-  mRNA rawTrans:$geneExp
+#if str($exp) != 'None':
+#if $exp_pre:
+  mRNA rawTrans:$exp
 #else
-  mRNA file:$geneExp
+  mRNA file:$exp
 #end if
 #end if 
 #if str($cnv) != 'None':
@@ -51,36 +51,36 @@
 #end if 
     </command>
     <inputs>
-        <param name="geneExp" type="data" format="tabular" label="Gene Exp Matrix" optional="true"/>
-        <param name="geneExp_pre" type="boolean" label="Pre-Adjusted Gene Expression Values"/>
+        <param name="exp" type="data" format="tabular" label="Gene Expression Matrix" optional="true"/>
+        <param name="exp_pre" type="boolean" label="Pre-Adjusted Gene Expression Values"/>
         <param name="cnv" type="data" format="tabular" label="Copy Number Matrix" optional="true"/>
         <param name="cnv_pre" type="boolean" label="Pre-Adjusted Copy Number Values"/>
         <param name="meth" type="data" format="tabular" label="Methylation Matrix" optional="true"/>
         <param name="meth_pre" type="boolean" label="Pre-Adjusted Methylation Values"/>
         <param name="dogma" type="data" format="tabular" label="Dogma Zip" optional="true"/>
-        <param name="pathway" type="data" format="tabular" label="Pathway File/Zip" optional="true"/>
+        <param name="pathway" type="data" format="tabular" label="Pathway File or Zip" optional="true"/>
         <param name="lower_boundary" type="text" value="0.33" label="Lower Boundary Cutoffs"/>
         <param name="upper_boundary" type="text" value="0.67" label="Upper Boundary Cutoffs"/>
-        <param name="nulls" type="integer" label="Null Count" optional="true"/>
+        <param name="nulls" type="integer" label="Null Size" optional="true"/>
         <param name="skip_em" type="boolean" label="Skip EM Cycle" checked="false"/>
-        <param name="storedparam" type="data" format="txt" label="Precomputer Parameter File" optional="True"/>
-        <param name="output_params" type="boolean" label="Output Params" checked="false"/>
-        <param name="output_config" type="boolean" label="Output Config" checked="false"/>
-        <param name="output_files" type="boolean" label="Output Files" checked="false"/>      
+        <param name="storedparam" type="data" format="txt" label="Precomputed Parameter File" optional="True"/>
+        <param name="output_params_flag" type="boolean" label="Output Params" checked="false"/>
+        <param name="output_config_flag" type="boolean" label="Output Config" checked="false"/>
+        <param name="output_zip_flag" type="boolean" label="Output Zip" checked="false"/>      
     </inputs>
     <outputs>
-        <data name="file_output" format="tabular" label="Unfiltered All"/>
-        <data name="file_output_params" format="tabular" label="Params">
-            <filter>output_params</filter>
+        <data name="output_file" format="tabular" label="Paradigm Unfiltered All File"/>
+        <data name="output_params" format="tabular" label="Paradigm Params File">
+            <filter>output_params_flag</filter>
         </data>
-        <data name="file_output_config" format="tabular" label="Config">
-            <filter>output_config</filter>
+        <data name="output_config" format="tabular" label="Paradigm Config File">
+            <filter>output_config_flag</filter>
         </data>
-        <data name="file_output_files" format="zip" label="Files">
-            <filter>output_files</filter>
+        <data name="output_zip" format="zip" label="Paradigm Output Zip">
+            <filter>output_zip_flag</filter>
         </data>
     </outputs>
     <help>
-Wrapper for Paradigm biological network inference program.  
+Wrapper for Paradigm biological network inference program.
     </help>
 </tool>
