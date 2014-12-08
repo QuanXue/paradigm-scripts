@@ -18,6 +18,8 @@
   --param $storedparam
 #end if
 -w ./
+#if $output_params_flag:
+  -y
 -o $output_file
 #if $output_params_flag:
   --op $output_params
@@ -64,6 +66,7 @@
         <param name="nulls" type="integer" label="Null Size" optional="true"/>
         <param name="skip_em" type="boolean" label="Skip EM Cycle" checked="false"/>
         <param name="storedparam" type="data" format="txt" label="Precomputed Parameter File" optional="True"/>
+        <param name="public_paradigm_flag" type="boolean" label="Using Paradigm Public Version" checked="false"/>
         <param name="output_params_flag" type="boolean" label="Output Params" checked="false"/>
         <param name="output_config_flag" type="boolean" label="Output Config" checked="false"/>
         <param name="output_zip_flag" type="boolean" label="Output Zip" checked="false"/>      
