@@ -253,7 +253,7 @@ def gp_main():
     run_em = options.run_em
     
     ## import dogma and pathway libraries
-    if options.dogma_lib.endswith(".zip"):
+    if options.dogma_lib.endswith(".zip") or options.dogma_lib.endswith(".dat"):
         dogma_lib = os.path.join(work_dir, "dogma")
         zf = zipfile.ZipFile(options.dogma_lib, "r")
         zf.extractall(dogma_lib)
@@ -263,7 +263,7 @@ def gp_main():
     else:
         logging.error("ERROR: dogma cannot be a regular file\n")
         sys.exit(1)
-    if options.pathway_lib.endswith(".zip"):
+    if options.pathway_lib.endswith(".zip") or options.pathway_lib.endswith(".dat"):
         pathway_lib = os.path.join(work_dir, "pathway")
         zf = zipfile.ZipFile(options.pathway_lib, "r")
         zf.extractall(pathway_lib)
@@ -271,9 +271,8 @@ def gp_main():
     elif os.path.isdir(options.pathway_lib):
         pathway_lib = os.path.abspath(options.pathway_lib)
     else:
-        pathway_lib = os.path.join(work_dir, "pathway")
-        os.makedirs(pathway_lib)
-        shutil.copy(options.pathway_lib, pathway_lib)
+        logging.error("ERROR: pathway cannot be a regular file\n")
+        sys.exit(1)
     
     ## initialize the stack and run
     logging.info("starting prepare")
@@ -294,6 +293,9 @@ def gp_main():
         if options.jobTree == None:
             options.jobTree = "./.jobTree"
         
+        jobtree_dir = options.jobTree.rstrip("/")
+        lasttree_dir = jobtree_dir + "_previous"
+        
         failed = s.startJobTree(options)
         if failed:
             logging.warning("WARNING: %d jobs failed" % (failed))
@@ -310,10 +312,10 @@ def gp_main():
                 shutil.copy(os.path.join(options.work_dir, "outputFiles.zip"), options.output_files)
             
             logging.info("Run complete!")
-            if os.path.exists(".lastTree"):
-                os.system("rm -rf .lastTree")
-            if os.path.exists(".jobTree"):
-                os.system("mv .jobTree .lastTree")
+            if os.path.exists(lasttree_dir):
+                shutil.rmtree(lasttree_dir)
+            if os.path.exists(jobtree_dir):
+                shutil.move(jobtree_dir, lasttree_dir)
 
 if __name__ == "__main__":
     from galaxyParadigm import *

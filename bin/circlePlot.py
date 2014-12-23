@@ -405,8 +405,8 @@ def main(args):
                 if "boundary_method" not in color_map[ring_index]:
                     color_map[ring_index]["boundary_method"] = "global"
                 if color_map[ring_index]["boundary_method"] == "global":
-                    ring_values = center_data.values
-                    ring_values = list(ring_values[ring_values != "nan"])
+                    ring_values = np.asarray(center_data.values)
+                    ring_values = list(ring_values[~np.isnan(ring_values)])
                     if "min_value" not in color_map[ring_index]:
                         color_map[ring_index]["min_value"] = min([0.0] + ring_values)
                     if "max_value" not in color_map[ring_index]:
@@ -432,14 +432,14 @@ def main(args):
                     color_map[ring_index]["boundary_method"] = "single"
                 if color_map[ring_index]["boundary_method"] == "global":
                     ring_values = np.asarray([value for row in ring_data[index].values for value in row])
-                    ring_values = list(ring_values[ring_values != "nan"])
+                    ring_values = list(ring_values[~np.isnan(ring_values)])
                     if "min_value" not in color_map[ring_index]:
                         color_map[ring_index]["min_value"] = min([0.0] + ring_values)
                     if "max_value" not in color_map[ring_index]:
                         color_map[ring_index]["max_value"] = max([0.0] + ring_values)
                 elif color_map[ring_index]["boundary_method"] == "selected":
-                    ring_values = np.asarray([value for row in ring_data[index].loc[features].values for value in row])
-                    ring_values = list(ring_values[ring_values != "nan"])
+                    ring_values = np.asarray([value for row in ring_data[index].loc[features + ["*"]].values for value in row])
+                    ring_values = list(ring_values[~np.isnan(ring_values)])
                     if "min_value" not in color_map[ring_index]:
                         color_map[ring_index]["min_value"] = min([0.0] + ring_values)
                     if "max_value" not in color_map[ring_index]:
@@ -447,13 +447,15 @@ def main(args):
                 elif color_map[ring_index]["boundary_method"] == "single":
                     color_map[ring_index]["min_value"] = {}
                     color_map[ring_index]["max_value"] = {}
-                    for feature in features:
+                    for feature in features + ["*"]:
                         ring_values = np.asarray([value for row in ring_data[index].loc[[feature]].values for value in row])
-                        ring_values = list(ring_values[ring_values != "nan"])
+                        ring_values = list(ring_values[~np.isnan(ring_values)])
                         color_map[ring_index]["min_value"][feature] = min([0.0] + ring_values)
                         color_map[ring_index]["max_value"][feature] = max([0.0] + ring_values)
                 else:
                     raise Exception("boundary method for ring is not valid")
+    
+    print color_map
     
     ## plot images
     for feature in features:
@@ -498,8 +500,14 @@ def main(args):
             for sample in samples:
                 try:
                     if "min_value" in color_map[ring_index] and "max_value" in color_map[ring_index]:
-                        min_value = color_map[ring_index]["min_value"]
-                        max_value = color_map[ring_index]["max_value"]
+                        if ring_feature in color_map[ring_index]["min_value"]:
+                            min_value = color_map[ring_index]["min_value"][ring_feature]
+                        else:
+                            min_value = color_map[ring_index]["min_value"]
+                        if ring_feature in color_map[ring_index]["max_value"]:
+                            max_value = color_map[ring_index]["max_value"][ring_feature]
+                        else:
+                            max_value = color_map[ring_index]["max_value"]
                         min_color = RGB(0, 0, 255)
                         zero_color = RGB(255, 255, 255)
                         max_color = RGB(255, 0, 0)
