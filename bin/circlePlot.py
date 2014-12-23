@@ -455,8 +455,6 @@ def main(args):
                 else:
                     raise Exception("boundary method for ring is not valid")
     
-    print color_map
-    
     ## plot images
     for feature in features:
         ## set name and label
