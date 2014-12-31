@@ -1,2 +1,8 @@
+bin/collectParameters
+bin/paradigm
+init.csh
+init.sh
+jobTree/
+sonLib/
 *.pyc
 .DS_Store

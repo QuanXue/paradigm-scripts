@@ -54,6 +54,6 @@ pathmark-scripts :
 
 clean :
 	rm -rf bin/paradigm bin/collectParameters pathmark-scripts jobTree sonLib init.sh init.csh
-	if [ -d 'example' ]; then \
-		cd example; make clean; \
+	if [ -d 'examples' ]; then \
+		cd examples; make clean; \
 	fi
