@@ -33,7 +33,7 @@ Note: This repository contains code that allows users to parallelize PARADIGM on
 
 Command-Line
 ------
-'''
+```
 galaxyParadigm.py [options] attachment file:path [attachment file:path ...]
 
 **attachment** - text
@@ -47,7 +47,7 @@ galaxyParadigm.py [options] attachment file:path [attachment file:path ...]
 **-t param_file** - text
 **-s** - text
 **-y** - text
-'''
+```
 
 Folders
 ------
