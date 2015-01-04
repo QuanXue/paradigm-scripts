@@ -1,5 +1,5 @@
 merge_merged_unfiltered.all.tab :
-	galaxyParadigm.py -y -p small_pid_66 genome rankAllFile:data/small_pid_66_genome.tab mRNA rankAllFile:data/small_pid_66_mRNA.tab
+	galaxyParadigm.py -y -p ../pathways/global_v1/ genome rankAllFile:data/Genome_Wide_SNP_6.genome.shared.tab mRNA rankAllFile:data/AgilentG4502A_07.mRNA.shared.tab
 
 clean :
-	rm -rf merge* paradigm.ipls clusterFiles pathway dogma config* jobs* outputFiles* params* *.dogma *.imap small_pid_66_*.tab *.log .jobTree .lastTree
+	rm -rf merge* paradigm.ipls clusterFiles pathway dogma config* jobs* outputFiles* params* *.dogma *.imap Genome_Wide_SNP_6.genome.shared.tab AgilentG4502A_07.mRNA.shared.tab *.log .jobTree .lastTree

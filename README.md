@@ -15,10 +15,10 @@ Charles Vaske, Stephen Benz, Sam Ng, Kyle Ellrott, David Haussler and Joshua M. 
 Requirements
 --------
 
-* [python](http://www.python.org/) >= 2.7
-   * [scipy](http://www.scipy.org/) >= 0.12.0
-   * [numpy](http://numpy.scipy.org/)
-   * [pandas](http://pandas.pydata.org/)
+- [python](http://www.python.org/) >= 2.7
+   - [scipy](http://www.scipy.org/) >= 0.12.0
+   - [numpy](http://numpy.scipy.org/)
+   - [pandas](http://pandas.pydata.org/)
 
 Installation
 -------
@@ -31,11 +31,28 @@ Note: This repository contains code that allows users to parallelize PARADIGM on
 - Source init files for paradigm-scripts (init.sh for bash and init.csh for csh)
 - Run code on example data in examples/ with "make"
 
+Command-Line
+------
+galaxyParadigm.py [options] attachment file:path [attachment file:path ...]
+
+- **attachment** - text 
+- **file:path** - text
+
+- **-w work_directory** - text
+- **-n null_size** - text
+- **-d dogma_library** - text
+- **-p pathway_library** - text
+- **-b discretization_bounds** - text
+- **-t param_file** - text
+- **-s** - text
+- **-y** - text
+
+
 Folders
 ------
 * bin : executables
 * dogmas : dogma plate models for PARADIGM
-* examples : BCCL inputs for demonstration purposes
+* examples : OV inputs for demonstration purposes
 * exe : pre-compiled paradigm binaries for select architectures
 * pathways : paradigm compatible pathway files
 
