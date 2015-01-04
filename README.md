@@ -33,20 +33,21 @@ Note: This repository contains code that allows users to parallelize PARADIGM on
 
 Command-Line
 ------
+'''
 galaxyParadigm.py [options] attachment file:path [attachment file:path ...]
 
-- **attachment** - text 
-- **file:path** - text
+**attachment** - text
+**file:path** - text
 
-- **-w work_directory** - text
-- **-n null_size** - text
-- **-d dogma_library** - text
-- **-p pathway_library** - text
-- **-b discretization_bounds** - text
-- **-t param_file** - text
-- **-s** - text
-- **-y** - text
-
+**-w work_directory** - text
+**-n null_size** - text
+**-d dogma_library** - text
+**-p pathway_library** - text
+**-b discretization_bounds** - text
+**-t param_file** - text
+**-s** - text
+**-y** - text
+'''
 
 Folders
 ------
