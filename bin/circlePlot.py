@@ -375,7 +375,7 @@ def main(args):
         else:
             samples = list(set(data.columns) | set(samples))
         if feature_file is not None:
-            data = data.loc[sorted(list(set(data.index) & set(features + ["*"])))]
+            pass
         else:
             features = list(set(data.index) | set(features))
         ring_data.append(data)
@@ -448,10 +448,14 @@ def main(args):
                     color_map[ring_index]["min_value"] = {}
                     color_map[ring_index]["max_value"] = {}
                     for feature in features + ["*"]:
-                        ring_values = np.asarray([value for row in ring_data[index].loc[[feature]].values for value in row])
-                        ring_values = list(ring_values[~np.isnan(ring_values)])
-                        color_map[ring_index]["min_value"][feature] = min([0.0] + ring_values)
-                        color_map[ring_index]["max_value"][feature] = max([0.0] + ring_values)
+                        if feature not in ring_data[index].index:
+                            color_map[ring_index]["min_value"][feature] = 0.0
+                            color_map[ring_index]["max_value"][feature] = 0.0
+                        else:
+                            ring_values = np.asarray([value for row in ring_data[index].loc[[feature]].values for value in row])
+                            ring_values = list(ring_values[~np.isnan(ring_values)])
+                            color_map[ring_index]["min_value"][feature] = min([0.0] + ring_values)
+                            color_map[ring_index]["max_value"][feature] = max([0.0] + ring_values)
                 else:
                     raise Exception("boundary method for ring is not valid")
     
