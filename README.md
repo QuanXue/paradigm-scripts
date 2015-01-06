@@ -36,17 +36,17 @@ Command-Line
 ```
 galaxyParadigm.py [options] attachment file:path [attachment file:path ...]
 
-**attachment** - text
-**file:path** - text
+attachment - dogma node to attach evidence to
+file:path - type of and path to evidence file
 
-**-w work_directory** - text
-**-n null_size** - text
-**-d dogma_library** - text
-**-p pathway_library** - text
-**-b discretization_bounds** - text
-**-t param_file** - text
-**-s** - text
-**-y** - text
+-w work_directory - path to directory where work is to be done (default: ./)
+-n null_size - number of null samples to be generated per sample
+-d dogma_library - path or zip file describing the PARADIGM plate model
+-p pathway_library - path, zip, or file containing PARADIGM pathway interactions
+-b discretization_bounds - value cutoffs for data discretization
+-t param_file - parameter file to use as initial state
+-s - skip EM parameter training
+-y - utilizing the public PARADIGM binary
 ```
 
 Folders
