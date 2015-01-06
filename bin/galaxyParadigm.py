@@ -216,7 +216,7 @@ def gp_main():
     parser.add_option("-y", dest = "paradigm_public", action = "store_true", default = False,
                       help = "This flag must be enabled when using the publically available version of paradigm")
     
-    parser.add_option("-o", "--output-ipls", dest = "output_ipls", default = "paradigm.ipls",
+    parser.add_option("-o", "--output-ipls", dest = "output_ipls", default = "unfiltered.all.tab",
                       help = "Unfiltered Output")
     parser.add_option("--op", "--output-params", dest = "output_params", default = None,
                       help = "Parameter Output")

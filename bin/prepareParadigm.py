@@ -416,7 +416,7 @@ def prepareParadigm(args):
         pathway = os.path.basename(p)
         buckets = numBuckets(pathway, samples, timings, targetJobLength)
         pid = pathway[0:-len("_pathway.tab")]
-        if buckets == 1:
+        if buckets == 1 and not publicParadigm:
             emOut = "outputFilesEM/" + pid + "_learned_parameters.fa"
             jfile.write("%s -p %s -c configEM.txt -b %s/ -e %s\n" % 
                         (paradigmExec, p, dataDir, emOut))
@@ -446,7 +446,7 @@ def prepareParadigm(args):
         pathway = os.path.basename(p)
         buckets = numBuckets(pathway, samples, timings, targetJobLength)
         pid = pathway[0:-len("_pathway.tab")]
-        if (buckets == 1):
+        if buckets == 1 and not publicParadigm:
             out = "outputFiles/" + pid + "_output.fa"
             jfile.write("%s -p %s -c config.txt -b %s/ -o %s\n" % 
                         (paradigmExec, p, dataDir, out))
@@ -473,7 +473,7 @@ def prepareParadigm(args):
                 numNullSamples = nullBatchSize
             buckets = numBuckets(pathway, numNullSamples, 
                                  timings, targetJobLength)
-            if buckets == 1:
+            if buckets == 1 and not publicParadigm:
                 out = "outputFiles/" + pid + "_batch_" + str(n) + "_output.fa"
                 c = "%s -p %s -c config.txt -b %s/na_batch_%i_ -o %s\n" % \
                     (paradigmExec, p, dataDir, n, out)
