@@ -51,9 +51,9 @@ file:path - type of and path to evidence file
 
 Folders
 ------
-* bin : executables
-* dogmas : dogma plate models for PARADIGM
-* examples : OV inputs for demonstration purposes
-* exe : pre-compiled paradigm binaries for select architectures
-* pathways : paradigm compatible pathway files
+- bin : executables
+- dogmas : dogma plate models for PARADIGM
+- examples : OV inputs for demonstration purposes
+- exe : pre-compiled paradigm binaries for select architectures
+- pathways : paradigm compatible pathway files
 

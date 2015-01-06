@@ -438,7 +438,7 @@ def main(args):
                     if "max_value" not in color_map[ring_index]:
                         color_map[ring_index]["max_value"] = max([0.0] + ring_values)
                 elif color_map[ring_index]["boundary_method"] == "selected":
-                    ring_values = np.asarray([value for row in ring_data[index].loc[features + ["*"]].values for value in row])
+                    ring_values = np.asarray([value for row in ring_data[index].loc[sorted(list(set(ring_data[index].index) & set(features + ["*"])))].values for value in row])
                     ring_values = list(ring_values[~np.isnan(ring_values)])
                     if "min_value" not in color_map[ring_index]:
                         color_map[ring_index]["min_value"] = min([0.0] + ring_values)
