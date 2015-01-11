@@ -312,19 +312,19 @@ def main(args):
     ## parse arguments
     parser = OptionParser(usage = "%prog [options] output_directory input_matrix [input_matrix ...]")
     parser.add_option("-s", "--samples", dest = "sample_file", default = None,
-                      help = "")
+                      help = "one column file of samples to plot")
     parser.add_option("-f", "--features", dest = "feature_file", default = None,
-                      help = "")
+                      help = "one column file of features to plot")
     parser.add_option("-o", "--order", dest = "order_parameters", default = None,
-                      help = "")
+                      help = "feature:file[,file ...] hierarchical sort on feature and data files")
     parser.add_option("-c", "--center", dest = "center_file", default = None,
-                      help = "")
+                      help = "two column file of feature scores for center circle colors")
     parser.add_option("-m", "--mapping", dest = "color_map_file", default = None,
-                      help = "")
+                      help = "color parameters file")
     parser.add_option("-e", "--extension", dest = "file_extension", default = "png",
-                      help = "")
+                      help = "output file extension (default: png)")
     parser.add_option("-l", "--label", dest = "print_label", action = "store_true", default = False,
-                      help = "")
+                      help = "output feature names for each plot")
     options, args = parser.parse_args()
     
     assert(len(args) >= 2)
