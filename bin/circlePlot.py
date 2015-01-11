@@ -138,7 +138,7 @@ def getColorFromMap(key, color_map):
         raise Exception("key not assigned in color map")
     except ValueError:
         raise Exception("mapped value not a valid color")
-    return(RGB(r, g, b).hex())
+    return(RGB(int(r), int(g), int(b)).hex())
 
 def getColorFromValue(value, min_value, max_value, min_color = RGB(0, 0, 255), zero_color = RGB(255, 255, 255), max_color = RGB(255, 0, 0)):
     """
@@ -479,7 +479,7 @@ def main(args):
                     max_value = color_map[ring_index]["max_value"]
                     center_color = getColorFromValue(center_data[feature], min_value, max_value)
                 else:
-                    center_color = getColorFromMap(center_data[feature], color_map[ring_index])
+                    center_color = getColorFromMap(str(center_data[feature]), color_map[ring_index])
             else:
                 center_color = RGB(200, 200, 200).hex()
         else:
@@ -521,12 +521,12 @@ def main(args):
                             max_color = RGB(color_map[ring_index]["max_color"][0], color_map[ring_index]["max_color"][1], color_map[ring_index]["max_color"][2])
                         current_ring.append(getColorFromValue(ring_data[index][sample].loc[ring_feature], min_value, max_value, min_color = min_color, zero_color = zero_color, max_color = max_color))
                     else:
-                        current_ring.append(getColorFromMap(ring_data[index][sample].loc[ring_feature], color_map[ring_index]))
+                        current_ring.append(getColorFromMap(str(ring_data[index][sample].loc[ring_feature]), color_map[ring_index]))
                 except:
                     current_ring.append(RGB(200, 200, 200).hex())
             ring_colors.append(current_ring)
         ## plot
-        plotCircle(image_file, image_label = image_label, center_color = center_color, ring_colors = ring_colors, inner_radius_total = 0.2, outer_radius_total = 0.5, width = 5)
+        plotCircle(image_file, image_label = image_label, center_color = center_color, ring_colors = ring_colors, inner_radius_total = 0.2, outer_radius_total = 0.5, width = 5, border_color = RGB(0, 0, 0).hex())
 
 if __name__ == "__main__":
     main(sys.argv[1:])
