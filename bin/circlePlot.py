@@ -331,6 +331,9 @@ def main(args):
     output_directory = os.path.abspath(args[0])
     ring_files = args[1:]
     
+    if not os.path.exists(output_directory):
+        os.mkdir(output_directory)
+    
     global image_format
     sample_file = options.sample_file
     feature_file = options.feature_file

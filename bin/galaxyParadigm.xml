@@ -1,5 +1,5 @@
-<tool id="paradigm" name="Paradigm" version="1.1.1">
-    <description>Paradigm</description>
+<tool id="galaxyParadigm" name="Paradigm" version="1.1.2">
+    <description>performs Paradigm data integration and pathway inference</description>
     <command interpreter="python">galaxyParadigm.py
 #if str($dogma) != 'None':
 --dogma $dogma
@@ -55,32 +55,32 @@ meth file:$meth
     </command>
     <inputs>
         <param name="exp" type="data" format="tabular" label="Gene Expression Matrix" optional="true"/>
-        <param name="exp_pre" type="boolean" label="Pre-Adjusted Gene Expression Values"/>
+        <param name="exp_pre" type="boolean" label="Preadjusted Gene Expression Values"/>
         <param name="cnv" type="data" format="tabular" label="Copy Number Matrix" optional="true"/>
-        <param name="cnv_pre" type="boolean" label="Pre-Adjusted Copy Number Values"/>
+        <param name="cnv_pre" type="boolean" label="Preadjusted Copy Number Values"/>
         <param name="meth" type="data" format="tabular" label="Methylation Matrix" optional="true"/>
-        <param name="meth_pre" type="boolean" label="Pre-Adjusted Methylation Values"/>
-        <param name="dogma" type="data" format="tabular" label="Dogma Zip" optional="true"/>
-        <param name="pathway" type="data" format="tabular" label="Pathway File or Zip" optional="true"/>
-        <param name="lower_boundary" type="text" value="0.33" label="Lower Boundary Cutoffs"/>
-        <param name="upper_boundary" type="text" value="0.67" label="Upper Boundary Cutoffs"/>
+        <param name="meth_pre" type="boolean" label="Preadjusted Methylation Values"/>
+        <param name="dogma" type="data" format="data" label="Paradigm Dogma Zip" optional="true"/>
+        <param name="pathway" type="data" format="data" label="Paradigm Pathway File or Zip" optional="true"/>
+        <param name="lower_boundary" type="text" value="0.33" label="Lower Discretization Boundary"/>
+        <param name="upper_boundary" type="text" value="0.67" label="Upper Discretization Boundary"/>
         <param name="nulls" type="integer" label="Null Size" optional="true"/>
         <param name="skip_em" type="boolean" label="Skip EM Cycle" checked="false"/>
-        <param name="storedparam" type="data" format="txt" label="Precomputed Parameter File" optional="True"/>
+        <param name="storedparam" type="data" format="tabular" label="Precomputed Parameter File" optional="True"/>
         <param name="public_paradigm_flag" type="boolean" label="Using Paradigm Public Version" checked="false"/>
         <param name="output_params_flag" type="boolean" label="Output Params" checked="false"/>
         <param name="output_config_flag" type="boolean" label="Output Config" checked="false"/>
         <param name="output_zip_flag" type="boolean" label="Output Zip" checked="false"/>      
     </inputs>
     <outputs>
-        <data name="output_file" format="tabular" label="Paradigm Unfiltered All File"/>
-        <data name="output_params" format="tabular" label="Paradigm Params File">
+        <data name="output_file" format="tabular" label="Paradigm Unfiltered All Matrix"/>
+        <data name="output_params" format="txt" label="Paradigm Params File">
             <filter>output_params_flag</filter>
         </data>
-        <data name="output_config" format="tabular" label="Paradigm Config File">
+        <data name="output_config" format="txt" label="Paradigm Config File">
             <filter>output_config_flag</filter>
         </data>
-        <data name="output_zip" format="zip" label="Paradigm Output Zip">
+        <data name="output_zip" format="data" label="Paradigm Output Zip">
             <filter>output_zip_flag</filter>
         </data>
     </outputs>

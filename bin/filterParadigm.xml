@@ -1,32 +1,35 @@
-<tool id="filter_paradigm" name="Filter Paradigm" version="1.0.0">
-    <description>Filter Paradigm</description>
-    <command interpreter="python">filterParadigm.py 
-#if $filtered_all:
-  --fa $file_filtered_all
+<tool id="filterParadigm" name="Paradigm Filter Features" version="1.0.0">
+    <description>filters down Paradigm features based on variance</description>
+    <command interpreter="python">filterParadigm.py
+#if $output_unfiltered_real_flag:
+--ur $output_unfiltered_real
 #end if
-#if $filtered_real:
-  --fr $file_filtered_real
+#if $output_filtered_all_flag:
+--fa $output_filtered_all
 #end if
-#if $unfiltered_real:
-  --ur $file_unfiltered_real
+#if $output_filtered_real_flag:
+--fr $output_filtered_real
 #end if
-$paradigm
+$ipl
     </command>
     <inputs>
-        <param name="paradigm" type="data" label="Paradigm Output" optional="false"/>
-        <param name="filtered_real" type="boolean" label="Output Filtered Real" checked="true"/>
-        <param name="filtered_all" type="boolean" label="Output Filtered All" checked="false"/>
-        <param name="unfiltered_real" type="boolean" label="Output UnFiltered Real" checked="false"/>
+        <param name="ipl" type="data" format="tabular" label="Paradigm Unfiltered All Matrix" optional="false"/>
+        <param name="output_unfiltered_real_flag" type="boolean" label="Output Unfiltered Real" checked="false"/>
+        <param name="output_filtered_all_flag" type="boolean" label="Output Filtered All" checked="false"/>
+        <param name="output_filtered_real_flag" type="boolean" label="Output Filtered Real" checked="true"/>
     </inputs>
     <outputs>
-        <data name="file_filtered_real" label="Filtered Real" format="tabular">
-            <filter>filtered_real</filter>
+        <data name="output_unfiltered_real" label="Paradigm Unfiltered Real Matrix" format="tabular">
+            <filter>output_unfiltered_real_flag</filter>
         </data>
-        <data name="file_filtered_all" label="Filtered All" format="tabular">
-            <filter>filtered_all</filter>
+        <data name="output_filtered_all" label="Paradigm Filtered All Matrix" format="tabular">
+            <filter>output_filtered_all_flag</filter>
         </data>
-        <data name="file_unfiltered_real" label="Unfiltered Real" format="tabular">
-            <filter>unfiltered_real</filter>
+        <data name="output_filtered_real" label="Paradigm Filtered Real Matrix" format="tabular">
+            <filter>output_filtered_real_flag</filter>
         </data>
     </outputs>
+    <help>
+Filter script for Paradigm IPL matrices.
+    </help>
 </tool>
