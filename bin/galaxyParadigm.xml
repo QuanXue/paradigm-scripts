@@ -62,8 +62,8 @@ meth file:$meth
         <param name="meth_pre" type="boolean" label="Preadjusted Methylation Values"/>
         <param name="dogma" type="data" format="data" label="Paradigm Dogma Zip" optional="true"/>
         <param name="pathway" type="data" format="data" label="Paradigm Pathway File or Zip" optional="true"/>
-        <param name="lower_boundary" type="text" value="0.33" label="Lower Discretization Boundary"/>
-        <param name="upper_boundary" type="text" value="0.67" label="Upper Discretization Boundary"/>
+        <param name="lower_boundary" type="float" value="0.33" label="Lower Discretization Boundary"/>
+        <param name="upper_boundary" type="float" value="0.67" label="Upper Discretization Boundary"/>
         <param name="nulls" type="integer" label="Null Size" optional="true"/>
         <param name="skip_em" type="boolean" label="Skip EM Cycle" checked="false"/>
         <param name="storedparam" type="data" format="tabular" label="Precomputed Parameter File" optional="True"/>
