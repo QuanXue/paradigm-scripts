@@ -253,7 +253,7 @@ def gp_main():
     run_em = options.run_em
     
     ## import dogma and pathway libraries
-    if options.dogma_lib.endswith(".zip") or options.dogma_lib.endswith(".dat"):
+    if zipfile.is_zipfile(options.dogma_lib):
         dogma_lib = os.path.join(work_dir, "dogma")
         zf = zipfile.ZipFile(options.dogma_lib, "r")
         zf.extractall(dogma_lib)
@@ -263,7 +263,7 @@ def gp_main():
     else:
         logging.error("ERROR: dogma cannot be a regular file\n")
         sys.exit(1)
-    if options.pathway_lib.endswith(".zip") or options.pathway_lib.endswith(".dat"):
+    if zipfile.is_zipfile(options.pathway_lib):
         pathway_lib = os.path.join(work_dir, "pathway")
         zf = zipfile.ZipFile(options.pathway_lib, "r")
         zf.extractall(pathway_lib)
