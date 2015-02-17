@@ -12,7 +12,7 @@ from jobTree.scriptTree.stack import Stack
 ## logger
 logging.basicConfig(filename="galaxy-paradigm.log", level=logging.INFO)
 
-## executabes
+## executables
 bin_dir = os.path.dirname(os.path.abspath(__file__))
 prepare_exec = os.path.join(bin_dir, "prepareParadigm.py")
 paradigm_exec = os.path.join(bin_dir, "paradigm")
@@ -26,14 +26,14 @@ standard_dogma = os.path.join(bin_dir, "dogma_standard.zip")
 standard_pathway = os.path.join(bin_dir, "pathway_constitutive_v2.zip")
 standard_inference = "method=BP,updates=SEQFIX,tol=1e-9,maxiter=10000,logdomain=0"
 
-## gp functions
+## functions
 def commandAvailable(executable):
     return(os.system("which %s > /dev/null 2> /dev/null" % executable) == 0)
 
 def zipDirectory(directory, zip):
     for root, dirs, files in os.walk(directory):
         for file in files:
-            zip.write(os.path.join(root, file))
+            zip.write(os.path.join(root, file), os.path.join(root, file).lstrip(directory).lstrip("/"))
 
 ## jt classes
 class ParadigmCommand(Target):
