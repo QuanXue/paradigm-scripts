@@ -254,8 +254,8 @@ def gp_main():
     
     ## import dogma and pathway libraries
     if zipfile.is_zipfile(options.dogma_lib):
-        dogma_lib = os.path.join(work_dir, "dogma")
         zf = zipfile.ZipFile(options.dogma_lib, "r")
+        dogma_lib = os.path.join(work_dir, "dogma")
         zf.extractall(dogma_lib)
         zf.close()
     elif os.path.isdir(options.dogma_lib):
@@ -264,8 +264,8 @@ def gp_main():
         logging.error("ERROR: dogma cannot be a regular file\n")
         sys.exit(1)
     if zipfile.is_zipfile(options.pathway_lib):
-        pathway_lib = os.path.join(work_dir, "pathway")
         zf = zipfile.ZipFile(options.pathway_lib, "r")
+        pathway_lib = os.path.join(work_dir, "pathway")
         zf.extractall(pathway_lib)
         zf.close()
     elif os.path.isdir(options.pathway_lib):
